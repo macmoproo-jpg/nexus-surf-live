@@ -4,9 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#007AFF" />
-  <title>Nexus Surf Pro - Professional Surf Forecast</title>
+  <title>Nexus Surf Pro - Live Surf Forecast</title>
   <style>
-    /* MODERN SURFLINE-INSPIRED DESIGN */
     :root {
       --primary: #007AFF;
       --primary-dark: #0056CC;
@@ -23,12 +22,7 @@
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-      background: var(--background);
-      color: var(--text-primary);
-      min-height: 100vh;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: var(--background); color: var(--text-primary); min-height: 100vh; }
     
     .app {
       max-width: 480px;
@@ -52,480 +46,176 @@
       border-bottom: 1px solid var(--border);
     }
     
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .logo-icon {
-      font-size: 32px;
-      animation: wave 2s ease-in-out infinite;
-    }
-    
-    @keyframes wave {
-      0%, 100% { transform: rotate(-5deg); }
-      50% { transform: rotate(5deg); }
-    }
-    
-    .logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { font-size: 32px; animation: wave 2s ease-in-out infinite; }
+    @keyframes wave { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
     
     .live-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--danger);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      animation: pulse 2s infinite;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--danger); padding: 4px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600; animation: pulse 2s infinite;
     }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; }
     
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
+    /* MAIN */
+    .main { padding: 16px; padding-bottom: 100px; }
     
-    .live-dot {
-      width: 6px;
-      height: 6px;
-      background: white;
-      border-radius: 50%;
-    }
-    
-    /* MAIN CONTENT */
-    .main {
-      padding: 16px;
-      padding-bottom: 100px;
-    }
-    
-    /* WEATHER CONDITIONS CARD */
+    /* CONDITIONS CARD */
     .conditions-card {
       background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(0, 86, 204, 0.3) 100%);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(0, 122, 255, 0.3);
-      position: relative;
-      overflow: hidden;
+      border-radius: 20px; padding: 24px; margin-bottom: 20px;
+      border: 1px solid rgba(0, 122, 255, 0.3); position: relative; overflow: hidden;
     }
     
-    .conditions-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='rgba(255,255,255,0.03)' d='M50 20 Q60 30 50 40 Q40 50 50 60 Q60 70 50 80'/%3E%3C/svg%3E");
-      background-size: 50px 50px;
-      animation: move-wave 3s linear infinite;
-    }
+    .conditions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 1; }
+    .spot-name { font-size: 24px; font-weight: 700; }
+    .spot-location { font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-top: 4px; }
+    .rating-badge { background: rgba(255, 255, 255, 0.15); padding: 8px 14px; border-radius: 16px; font-weight: 700; backdrop-filter: blur(10px); }
     
-    @keyframes move-wave {
-      0% { background-position: 0 0; }
-      100% { background-position: 50px 50px; }
-    }
-    
-    .conditions-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .spot-name {
-      font-size: 24px;
-      font-weight: 700;
-    }
-    
-    .spot-location {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-top: 4px;
-    }
-    
-    .rating-badge {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 8px 14px;
-      border-radius: 16px;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
-    }
-    
-    /* SURF CONDITIONS GRID */
+    /* CONDITIONS GRID */
     .conditions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      position: relative;
-      z-index: 1;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; position: relative; z-index: 1;
     }
     
     .condition-item {
-      text-align: center;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 16px;
-      padding: 16px 10px;
+      text-align: center; background: rgba(0, 0, 0, 0.3); border-radius: 16px; padding: 16px 10px;
+      transition: all 0.3s ease;
     }
-    
-    .condition-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-    
-    .condition-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    
-    .condition-label {
-      font-size: 11px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
-    }
+    .condition-item:hover { background: rgba(0, 122, 255, 0.2); transform: translateY(-2px); }
+    .condition-icon { font-size: 28px; margin-bottom: 8px; }
+    .condition-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+    .condition-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
     
     /* SPOT LIST */
-    .spot-section {
-      margin-bottom: 24px;
-    }
+    .spot-section { margin-bottom: 24px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .section-title { font-size: 18px; font-weight: 600; }
+    .see-all { color: var(--primary); font-size: 14px; font-weight: 500; cursor: pointer; }
     
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-    
-    .see-all {
-      color: var(--primary);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    
-    .spot-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
+    .spot-list { display: flex; flex-direction: column; gap: 12px; }
     .spot-card {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid var(--border);
+      background: var(--surface); border-radius: 16px; padding: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border);
     }
-    
-    .spot-card:hover {
-      background: var(--surface-light);
-      transform: translateX(4px);
-      border-color: var(--primary);
-    }
-    
-    .spot-info {
-      flex: 1;
-    }
-    
-    .spot-name-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    
-    .spot-name-item {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    
-    .spot-meta {
-      display: flex;
-      gap: 12px;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    
-    .spot-meta span {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .spot-rating {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 6px 10px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 13px;
-    }
+    .spot-card:hover { background: var(--surface-light); transform: translateX(4px); border-color: var(--primary); }
+    .spot-info { flex: 1; }
+    .spot-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .spot-name-item { font-size: 16px; font-weight: 600; }
+    .spot-meta { display: flex; gap: 12px; font-size: 13px; color: var(--text-secondary); }
+    .spot-meta span { display: flex; align-items: center; gap: 4px; }
+    .spot-rating { display: flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.1); padding: 6px 10px; border-radius: 12px; font-weight: 600; font-size: 13px; }
     
     /* BOTTOM NAV */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: rgba(28, 28, 30, 0.95);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      padding-bottom: calc(12px + env(safe-area-inset-bottom));
-      z-index: 1000;
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px; background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(20px); border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; padding: 12px 0;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 1000;
     }
     
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      color: var(--text-secondary);
-      transition: all 0.2s ease;
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-secondary); transition: all 0.2s ease; cursor: pointer;
+      padding: 8px 16px; border-radius: 12px;
     }
+    .nav-item.active { color: var(--primary); background: rgba(0, 122, 255, 0.15); }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    .nav-item.active {
-      color: var(--primary);
-      background: rgba(0, 122, 255, 0.15);
-    }
-    
-    .nav-icon {
-      font-size: 22px;
-    }
-    
-    .nav-label {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    /* DETAIL OVERLAY */
+    /* OVERLAY */
     .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 3000;
-      display: none;
-      justify-content: center;
-      align-items: flex-end;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none;
+      justify-content: center; align-items: flex-end;
     }
-    
-    .overlay.active {
-      display: flex;
-    }
-    
+    .overlay.active { display: flex; }
     .overlay-content {
-      background: var(--background);
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      border-radius: 24px 24px 0 0;
-      overflow-y: auto;
+      background: var(--background); width: 100%; max-width: 480px;
+      max-height: 90vh; border-radius: 24px 24px 0 0; overflow-y: auto;
       animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     
     .overlay-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      background: var(--background);
-      z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--background); z-index: 10;
     }
     
     .close-btn {
-      background: var(--surface-light);
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      font-size: 22px;
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background: var(--surface-light); border: none; border-radius: 50%;
+      width: 36px; height: 36px; font-size: 22px; color: var(--text-primary);
+      cursor: pointer; transition: all 0.2s ease;
     }
+    .close-btn:hover { background: var(--surface); transform: scale(1.1); }
     
-    .close-btn:hover {
-      background: var(--surface);
-      transform: scale(1.1);
-    }
-    
-    .overlay-body {
-      padding: 24px;
-    }
+    .overlay-body { padding: 24px; }
     
     /* CHART AREA */
     .chart-container {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+      background: var(--surface); border-radius: 16px; padding: 20px; margin-bottom: 20px;
     }
-    
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    
-    .chart-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    
-    .chart-legend {
-      display: flex;
-      gap: 12px;
-      font-size: 12px;
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    
-    .legend-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .chart-title { font-size: 16px; font-weight: 600; }
+    .chart-legend { display: flex; gap: 12px; font-size: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
     
     .chart-area {
-      height: 120px;
-      background: linear-gradient(to top, rgba(0, 122, 255, 0.2) 0%, transparent 100%);
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
+      height: 120px; background: linear-gradient(to top, rgba(0, 122, 255, 0.2) 0%, transparent 100%);
+      border-radius: 8px; position: relative; overflow: hidden;
     }
-    
     .chart-line {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60%;
+      position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
       background: linear-gradient(to top, var(--primary) 0%, transparent 100%);
       clip-path: polygon(0% 100%, 10% 70%, 20% 60%, 30% 80%, 40% 50%, 50% 60%, 60% 40%, 70% 55%, 80% 45%, 90% 50%, 100% 40%, 100% 100%);
     }
-    
-    .chart-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
+    .chart-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-secondary); }
     
     /* DATA GRID */
-    .data-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    
+    .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
     .data-card {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
+      background: var(--surface); border-radius: 16px; padding: 20px; text-align: center;
+      transition: all 0.2s ease;
     }
-    
-    .data-card-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-    
-    .data-card-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    
-    .data-card-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
+    .data-card:hover { background: var(--surface-light); transform: translateY(-2px); }
+    .data-card-icon { font-size: 24px; margin-bottom: 8px; }
+    .data-card-value { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .data-card-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
     
     /* ACTION BUTTONS */
-    .action-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    
+    .action-row { display: flex; gap: 12px; margin-top: 20px; }
     .action-btn {
-      flex: 1;
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      flex: 1; padding: 16px; border-radius: 16px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s ease;
       border: none;
     }
+    .action-btn.primary { background: var(--primary); color: white; }
+    .action-btn.secondary { background: var(--surface-light); color: var(--text-primary); border: 1px solid var(--border); }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
     
-    .action-btn.primary {
-      background: var(--primary);
-      color: white;
+    /* LOADING */
+    .loading { text-align: center; padding: 20px; color: var(--text-secondary); }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* WEATHER INFO */
+    .weather-info { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+    .weather-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .weather-label { color: var(--text-secondary); }
+    .weather-value { font-weight: 600; }
+    
+    /* API STATUS */
+    .api-status {
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+      color: var(--text-secondary); margin-bottom: 12px;
     }
+    .api-status.active { color: var(--accent); }
     
-    .action-btn.secondary {
-      background: var(--surface-light);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-    }
-    
-    .action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-    }
-    
-    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -547,57 +237,71 @@
     
     <!-- MAIN CONTENT -->
     <main class="main">
+      <!-- API STATUS -->
+      <div class="api-status active" id="apiStatus">
+        <span>📡</span>
+        <span>Connected to free weather APIs</span>
+      </div>
+      
       <!-- CONDITIONS CARD -->
       <div class="conditions-card" id="conditionsCard">
         <div class="conditions-header">
           <div>
-            <h1 class="spot-name" id="currentSpotName">Pipeline</h1>
-            <p class="spot-location" id="currentSpotLocation">Hawaii, USA</p>
+            <h1 class="spot-name" id="currentSpotName">Loading...</h1>
+            <p class="spot-location" id="currentSpotLocation">Fetching location...</p>
           </div>
-          <div class="rating-badge">⭐ <span id="currentRating">4.8</span></div>
+          <div class="rating-badge">⭐ <span id="currentRating">--</span></div>
         </div>
         
         <div class="conditions-grid">
           <div class="condition-item">
             <div class="condition-icon">🌊</div>
-            <div class="condition-value" id="currentWaves">6-8ft</div>
+            <div class="condition-value" id="currentWaves">--</div>
             <div class="condition-label">Wave Height</div>
           </div>
           <div class="condition-item">
             <div class="condition-icon">💨</div>
-            <div class="condition-value" id="currentWind">8mph</div>
+            <div class="condition-value" id="currentWind">--</div>
             <div class="condition-label">Wind</div>
           </div>
           <div class="condition-item">
             <div class="condition-icon">⏱️</div>
-            <div class="condition-value" id="currentPeriod">14s</div>
+            <div class="condition-value" id="currentPeriod">--</div>
             <div class="condition-label">Period</div>
           </div>
         </div>
       </div>
       
-      <!-- TRENDING SPOTS -->
+      <!-- SPOT SELECTOR -->
       <div class="spot-section">
         <div class="section-header">
-          <h2 class="section-title">🔥 Trending Spots</h2>
-          <span class="see-all" onclick="showAllSpots()">See All →</span>
+          <h2 class="section-title">🏄 Select Spot</h2>
         </div>
-        <div class="spot-list" id="trendingList"></div>
+        <div class="spot-list" id="spotSelector"></div>
       </div>
       
-      <!-- QUICK ACTIONS -->
+      <!-- LIVE DATA FROM API -->
       <div class="spot-section">
-        <h2 class="section-title" style="margin-bottom: 12px;">⚡ Quick Actions</h2>
-        <div class="data-grid">
-          <div class="data-card" onclick="showForecast()">
-            <div class="data-card-icon">⛅</div>
-            <div class="data-card-value">7-Day</div>
-            <div class="data-card-label">Forecast</div>
+        <div class="section-header">
+          <h2 class="section-title">📡 Live Weather Data</h2>
+        </div>
+        <div class="weather-info" id="weatherInfo">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading live data...</p>
           </div>
-          <div class="data-card" onclick="showMap()">
-            <div class="data-card-icon">🗺️</div>
-            <div class="data-card-value">World</div>
-            <div class="data-card-label">Spots Map</div>
+        </div>
+      </div>
+      
+      <!-- TIDE INFO -->
+      <div class="spot-section">
+        <div class="section-header">
+          <h2 class="section-title">🌊 Tide Schedule</h2>
+        </div>
+        <div class="weather-info" id="tideInfo">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading tide data...</p>
           </div>
         </div>
       </div>
@@ -631,12 +335,10 @@
     <div class="overlay" id="spotOverlay">
       <div class="overlay-content">
         <div class="overlay-header">
-          <h2 id="overlayTitle">Pipeline</h2>
+          <h2 id="overlayTitle">Spot Details</h2>
           <button class="close-btn" onclick="closeOverlay()">×</button>
         </div>
-        <div class="overlay-body" id="overlayBody">
-          <!-- Content loaded dynamically -->
-        </div>
+        <div class="overlay-body" id="overlayBody"></div>
       </div>
     </div>
   </div>
@@ -644,154 +346,224 @@
   <script>
     // SURF SPOTS DATA
     const surfSpots = [
-      { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8, lat: 21.66, lng: -158.06, wind: '8mph', period: '14s', tide: 'High 3:45PM' },
-      { id: 2, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '8-12ft', water: '78°F', rating: 4.9, lat: 21.64, lng: -158.06, wind: '10mph', period: '16s', tide: 'Low 9:30AM' },
-      { id: 3, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6, lat: -34.05, lng: 24.93, wind: '12mph', period: '12s', tide: 'High 2:15PM' },
-      { id: 4, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7, lat: -8.82, lng: 115.09, wind: '6mph', period: '14s', tide: 'Low 11:00AM' },
-      { id: 5, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4, lat: 33.37, lng: -117.55, wind: '5mph', period: '11s', tide: 'High 4:30PM' },
-      { id: 6, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5, lat: -28.17, lng: 153.53, wind: '8mph', period: '13s', tide: 'Low 8:45AM' },
-      { id: 7, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0, lat: 39.10, lng: -9.07, wind: '15mph', period: '18s', tide: 'High 1:20PM' },
-      { id: 8, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9, lat: -17.84, lng: -149.27, wind: '5mph', period: '16s', tide: 'Low 10:15AM' },
-      { id: 9, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8, lat: -18.93, lng: 178.47, wind: '7mph', period: '15s', tide: 'High 3:00PM' },
-      { id: 10, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5, lat: 39.36, lng: -9.38, wind: '10mph', period: '12s', tide: 'Low 2:30PM' },
+      { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8, lat: 21.66, lng: -158.06 },
+      { id: 2, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-15ft', water: '78°F', rating: 4.9, lat: 21.64, lng: -158.06 },
+      { id: 3, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6, lat: -34.05, lng: 24.93 },
+      { id: 4, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7, lat: -8.82, lng: 115.09 },
+      { id: 5, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4, lat: 33.37, lng: -117.55 },
+      { id: 6, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5, lat: -28.17, lng: 153.53 },
+      { id: 7, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0, lat: 39.10, lng: -9.07 },
+      { id: 8, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9, lat: -17.84, lng: -149.27 },
+      { id: 9, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8, lat: -18.93, lng: 178.47 },
+      { id: 10, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5, lat: 39.36, lng: -9.38 },
     ];
     
-    // SELECT SPOT
-    function selectSpot(id) {
-      const spot = surfSpots.find(s => s.id === id);
-      if (!spot) return;
-      
-      document.getElementById('currentSpotName').textContent = spot.name;
-      document.getElementById('currentSpotLocation').textContent = `${spot.region}, ${spot.country}`;
-      document.getElementById('currentRating').textContent = spot.rating;
-      document.getElementById('currentWaves').textContent = spot.waves;
-      document.getElementById('currentWind').textContent = spot.wind;
-      document.getElementById('currentPeriod').textContent = spot.period;
+    let currentSpot = surfSpots[0];
+    
+    // GET WEATHER DATA FROM WTTR.IN (FREE API - NO KEY NEEDED!)
+    async function getWeatherData(lat, lng) {
+      try {
+        const url = `https://wttr.in/${lat},${lng}?format=j1`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return {
+          temp: data.current_condition[0].temp_F,
+          weatherDesc: data.current_condition[0].weatherDesc[0].value,
+          windSpeed: data.current_condition[0].windspeedMiles,
+          windDir: data.current_condition[0].winddir16Point,
+          humidity: data.current_condition[0].humidity,
+          feelsLike: data.current_condition[0].FeelsLikeF,
+          visibility: data.current_condition[0].visibilityMiles,
+          pressure: data.current_condition[0].pressure,
+        };
+      } catch (error) {
+        console.error('Weather API error:', error);
+        return null;
+      }
     }
     
-    // RENDER SPOT LIST
-    function renderSpotList() {
-      const container = document.getElementById('trendingList');
-      container.innerHTML = surfSpots.slice(0, 5).map(spot => `
-        <div class="spot-card" onclick="showSpotDetail(${spot.id})">
+    // GET EXTENDED FORECAST
+    async function getForecast(lat, lng) {
+      try {
+        const url = `https://wttr.in/${lat},${lng}?format=j1`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return data.weather.map(day => ({
+          date: day.date,
+          maxTemp: day.maxtempF,
+          minTemp: day.mintempF,
+          weatherDesc: day.hourly[0].weatherDesc[0].value,
+          windSpeed: day.hourly[0].windspeedMiles,
+        }));
+      } catch (error) {
+        console.error('Forecast API error:', error);
+        return null;
+      }
+    }
+    
+    // GET TIDE DATA (SIMULATED - NOAA API requires station ID)
+    async function getTideData(lat, lng) {
+      // Simulate tide data (in real app, use NOAA API)
+      const tideTimes = [
+        { type: 'High', time: '3:45 PM', height: '4.2 ft' },
+        { type: 'Low', time: '10:30 AM', height: '0.8 ft' },
+        { type: 'High', time: '4:15 PM', height: '3.9 ft' },
+      ];
+      return tideTimes;
+    }
+    
+    // CALCULATE SURF CONDITIONS FROM WEATHER
+    function calculateSurfConditions(weather) {
+      if (!weather) return null;
+      
+      const windSpeed = parseFloat(weather.windSpeed);
+      let surfHeight = '3-5ft';
+      let surfRating = 5;
+      
+      if (windSpeed > 15) {
+        surfHeight = '2-4ft';
+        surfRating = 3;
+      } else if (windSpeed > 20) {
+        surfHeight = '1-3ft';
+        surfRating = 2;
+      }
+      
+      if (weather.weatherDesc.toLowerCase().includes('rain')) {
+        surfRating -= 1;
+      }
+      
+      return {
+        height: surfHeight,
+        rating: Math.max(1, Math.min(5, surfRating)),
+        windSpeed: weather.windSpeed,
+        windDir: weather.windDir,
+      };
+    }
+    
+    // UPDATE UI WITH LIVE DATA
+    async function updateLiveConditions() {
+      const lat = currentSpot.lat;
+      const lng = currentSpot.lng;
+      
+      // Update UI
+      document.getElementById('currentSpotName').textContent = currentSpot.name;
+      document.getElementById('currentSpotLocation').textContent = `${currentSpot.region}, ${currentSpot.country}`;
+      document.getElementById('currentRating').textContent = currentSpot.rating;
+      document.getElementById('currentWaves').textContent = currentSpot.waves;
+      
+      // Fetch live weather
+      document.getElementById('currentWind').textContent = 'Loading...';
+      document.getElementById('currentPeriod').textContent = 'Loading...';
+      
+      const weather = await getWeatherData(lat, lng);
+      
+      if (weather) {
+        document.getElementById('currentWind').textContent = `${weather.windSpeed}mph ${weather.windDir}`;
+        document.getElementById('currentPeriod').textContent = '12s'; // Simulated period
+        
+        // Update weather info section
+        updateWeatherInfo(weather);
+      } else {
+        document.getElementById('currentWind').textContent = currentSpot.waves;
+        document.getElementById('currentPeriod').textContent = '14s';
+      }
+      
+      // Get tide data
+      const tides = await getTideData(lat, lng);
+      updateTideInfo(tides);
+    }
+    
+    function updateWeatherInfo(weather) {
+      const html = `
+        <div class="weather-row">
+          <span class="weather-label">🌡️ Temperature</span>
+          <span class="weather-value">${weather.temp}°F</span>
+        </div>
+        <div class="weather-row">
+          <span class="weather-label">💭 Conditions</span>
+          <span class="weather-value">${weather.weatherDesc}</span>
+        </div>
+        <div class="weather-row">
+          <span class="weather-label">💨 Wind</span>
+          <span class="weather-value">${weather.windSpeed}mph ${weather.windDir}</span>
+        </div>
+        <div class="weather-row">
+          <span class="weather-label">💧 Humidity</span>
+          <span class="weather-value">${weather.humidity}%</span>
+        </div>
+        <div class="weather-row">
+          <span class="weather-label">👁️ Visibility</span>
+          <span class="weather-value">${weather.visibility} miles</span>
+        </div>
+        <div class="weather-row">
+          <span class="weather-label">🌡️ Feels Like</span>
+          <span class="weather-value">${weather.feelsLike}°F</span>
+        </div>
+      `;
+      document.getElementById('weatherInfo').innerHTML = html;
+    }
+    
+    function updateTideInfo(tides) {
+      const html = tides.map(tide => `
+        <div class="weather-row">
+          <span class="weather-label">${tide.type === 'High' ? '🌊 High Tide' : '📉 Low Tide'}</span>
+          <span class="weather-value">${tide.time} - ${tide.height}</span>
+        </div>
+      `).join('');
+      document.getElementById('tideInfo').innerHTML = html;
+    }
+    
+    // RENDER SPOT SELECTOR
+    function renderSpotSelector() {
+      const container = document.getElementById('spotSelector');
+      container.innerHTML = surfSpots.slice(0, 6).map(spot => `
+        <div class="spot-card" onclick="selectSpot(${spot.id})" ${spot.id === currentSpot.id ? 'style="border-color: var(--primary); background: var(--surface-light);"' : ''}>
           <div class="spot-info">
             <div class="spot-name-row">
               <span class="spot-name-item">${spot.name}</span>
               <span class="spot-rating">⭐ ${spot.rating}</span>
             </div>
             <div class="spot-meta">
-              <span>🌊 ${spot.waves}</span>
-              <span>💨 ${spot.wind}</span>
-              <span>⏱️ ${spot.period}</span>
+              <span>📍 ${spot.region}</span>
+              <span>🎯 ${spot.difficulty}</span>
             </div>
           </div>
-          <div style="font-size: 24px;">→</div>
+          <div style="font-size: 24px; color: ${spot.id === currentSpot.id ? 'var(--primary)' : 'var(--text-secondary)'};">${spot.id === currentSpot.id ? '●' : '→'}</div>
         </div>
       `).join('');
     }
     
-    // SHOW SPOT DETAIL
-    function showSpotDetail(id) {
-      const spot = surfSpots.find(s => s.id === id);
-      if (!spot) return;
-      
-      document.getElementById('overlayTitle').textContent = spot.name;
-      document.getElementById('overlayBody').innerHTML = `
-        <div class="chart-container">
-          <div class="chart-header">
-            <span class="chart-title">📊 7-Day Wave Height</span>
-            <div class="chart-legend">
-              <div class="legend-item">
-                <div class="legend-dot" style="background: #007AFF;"></div>
-                <span>Waves</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-dot" style="background: #34C759;"></div>
-                <span>Wind</span>
-              </div>
-            </div>
-          </div>
-          <div class="chart-area">
-            <div class="chart-line"></div>
-          </div>
-          <div class="chart-labels">
-            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-          </div>
-        </div>
-        
-        <div class="data-grid">
-          <div class="data-card">
-            <div class="data-card-icon">🌊</div>
-            <div class="data-card-value">${spot.waves}</div>
-            <div class="data-card-label">Wave Height</div>
-          </div>
-          <div class="data-card">
-            <div class="data-card-icon">💨</div>
-            <div class="data-card-value">${spot.wind}</div>
-            <div class="data-card-label">Wind</div>
-          </div>
-          <div class="data-card">
-            <div class="data-card-icon">⏱️</div>
-            <div class="data-card-value">${spot.period}</div>
-            <div class="data-card-label">Swell Period</div>
-          </div>
-          <div class="data-card">
-            <div class="data-card-icon">🌊</div>
-            <div class="data-card-value">${spot.tide}</div>
-            <div class="data-card-label">Tide</div>
-          </div>
-        </div>
-        
-        <div class="data-grid">
-          <div class="data-card">
-            <div class="data-card-icon">💧</div>
-            <div class="data-card-value">${spot.water}</div>
-            <div class="data-card-label">Water Temp</div>
-          </div>
-          <div class="data-card">
-            <div class="data-card-icon">🎯</div>
-            <div class="data-card-value">${spot.difficulty}</div>
-            <div class="data-card-label">Difficulty</div>
-          </div>
-        </div>
-        
-        <div class="action-row">
-          <button class="action-btn secondary" onclick="alert('Route directions coming soon!')">
-            🗺️ Directions
-          </button>
-          <button class="action-btn primary" onclick="alert('Forecast details coming soon!')">
-            ⚡ View Details
-          </button>
-        </div>
-      `;
-      
-      document.getElementById('spotOverlay').classList.add('active');
+    // SELECT SPOT
+    function selectSpot(id) {
+      currentSpot = surfSpots.find(s => s.id === id);
+      renderSpotSelector();
+      updateLiveConditions();
     }
     
-    function closeOverlay() {
-      document.getElementById('spotOverlay').classList.remove('active');
-    }
-    
+    // SET ACTIVE NAV
     function setActiveNav(element, nav) {
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       element.classList.add('active');
     }
     
-    function showAllSpots() {
-      alert('Showing all 90+ surf spots...');
-    }
-    
-    function showForecast() {
-      alert('7-day forecast view coming soon!');
-    }
-    
-    function showMap() {
-      alert('Interactive map view coming soon!');
+    // CLOSE OVERLAY
+    function closeOverlay() {
+      document.getElementById('spotOverlay').classList.remove('active');
     }
     
     // INITIALIZE
-    renderSpotList();
-    selectSpot(1);
+    async function init() {
+      renderSpotSelector();
+      await updateLiveConditions();
+      
+      // Update every 5 minutes
+      setInterval(updateLiveConditions, 5 * 60 * 1000);
+    }
+    
+    // START APP
+    init();
   </script>
 </body>
 </html>

@@ -4,415 +4,763 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#007AFF" />
-  <title>Nexus Surf Pro - Live Surf Forecast</title>
+  <title>Nexus Surf Pro - Professional Surf Forecast</title>
   <style>
+    /* MODERN SURFLINE-INSPIRED DESIGN */
     :root {
-      --primary-color: #007AFF;
+      --primary: #007AFF;
       --primary-dark: #0056CC;
-      --secondary-color: #34C759;
-      --background: #F8F8F8;
-      --card-bg: #FFFFFF;
-      --text-primary: #1a1a1a;
-      --text-secondary: #666666;
-      --border-color: #E5E5EA;
+      --accent: #34C759;
+      --warning: #FF9500;
+      --danger: #FF3B30;
+      --background: #0A0A0A;
+      --surface: #1C1C1E;
+      --surface-light: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --border: #38383A;
+      --gradient: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
     }
+    
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--background); }
-    .app { max-width: 480px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
-    .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: bold; }
-    .main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
-    .nav { background: white; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px; position: fixed; bottom: 0; width: 100%; max-width: 480px; z-index: 1000; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; cursor: pointer; padding: 8px 16px; border-radius: 12px; }
-    .nav-item.active { background: #E8F4FF; color: var(--primary-color); }
-    .nav-icon { font-size: 22px; margin-bottom: 4px; }
-    .nav-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
-    .nav-item.active .nav-label { color: var(--primary-color); }
-    .section { margin-bottom: 24px; }
-    .section-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
-    .spot-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .spot-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
-    .spot-header { display: flex; justify-content: space-between; align-items: center; }
-    .spot-name { font-size: 18px; font-weight: bold; }
-    .rating-badge { background: #FFEBEE; padding: 4px 10px; border-radius: 12px; font-weight: bold; color: #FF3B30; }
-    .spot-location { font-size: 14px; color: var(--text-secondary); margin: 8px 0; }
-    .spot-conditions { display: flex; gap: 12px; font-size: 12px; color: var(--primary-color); font-weight: 600; }
-    .difficulty-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-    .difficulty-beginner { background: #E8F5E9; color: #2E7D32; }
-    .difficulty-intermediate { background: #FFF3E0; color: #E65100; }
-    .difficulty-advanced { background: #FFEBEE; color: #C62828; }
-    .difficulty-expert { background: #FFDDEE; color: #C2185B; }
-    .action-button { display: flex; flex-direction: column; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 8px; cursor: pointer; transition: all 0.2s ease; }
-    .action-button:hover { background: var(--primary-color); color: white; transform: translateY(-2px); }
-    .action-icon { font-size: 28px; margin-bottom: 6px; }
-    .action-text { font-size: 11px; font-weight: 600; }
-    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-    .tab { display: none; }
-    .tab.active { display: block; animation: fadeIn 0.3s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
     
-    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
-    .overlay.active { display: flex; }
-    .overlay-content { background: var(--card-bg); width: 100%; max-width: 480px; max-height: 85vh; border-radius: 20px 20px 0 0; overflow-y: auto; }
-    .overlay-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-color); }
-    .close-btn { background: #f0f0f0; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 20px; cursor: pointer; }
-    .overlay-body { padding: 20px; }
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--gradient);
+      position: relative;
+    }
     
-    .forecast-card { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); border-radius: 20px; padding: 24px; color: white; margin-bottom: 20px; }
-    .forecast-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .forecast-icon { font-size: 48px; }
-    .forecast-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .forecast-detail { text-align: center; }
-    .forecast-detail .icon { font-size: 24px; display: block; margin-bottom: 8px; }
-    .forecast-detail .label { font-size: 12px; opacity: 0.8; display: block; }
-    .forecast-detail .value { font-size: 16px; font-weight: bold; display: block; }
+    /* HEADER */
+    .header {
+      background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border);
+    }
     
-    .community-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-    .community-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .avatar { width: 40px; height: 40px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-    .post-time { font-size: 12px; color: var(--text-secondary); }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     
-    .loading { text-align: center; padding: 40px; color: var(--text-secondary); }
-    .spinner { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .logo-icon {
+      font-size: 32px;
+      animation: wave 2s ease-in-out infinite;
+    }
     
-    .info-box { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); border-radius: 20px; padding: 24px; color: white; text-align: center; margin-bottom: 80px; }
-    .info-box h3 { font-size: 24px; margin-bottom: 12px; }
-    .info-box p { font-size: 14px; opacity: 0.9; }
+    @keyframes wave {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+    
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--danger);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+    }
+    
+    /* MAIN CONTENT */
+    .main {
+      padding: 16px;
+      padding-bottom: 100px;
+    }
+    
+    /* WEATHER CONDITIONS CARD */
+    .conditions-card {
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(0, 86, 204, 0.3) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0, 122, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .conditions-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='rgba(255,255,255,0.03)' d='M50 20 Q60 30 50 40 Q40 50 50 60 Q60 70 50 80'/%3E%3C/svg%3E");
+      background-size: 50px 50px;
+      animation: move-wave 3s linear infinite;
+    }
+    
+    @keyframes move-wave {
+      0% { background-position: 0 0; }
+      100% { background-position: 50px 50px; }
+    }
+    
+    .conditions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .spot-name {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .spot-location {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 4px;
+    }
+    
+    .rating-badge {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+    
+    /* SURF CONDITIONS GRID */
+    .conditions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .condition-item {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      padding: 16px 10px;
+    }
+    
+    .condition-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .condition-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .condition-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+    
+    /* SPOT LIST */
+    .spot-section {
+      margin-bottom: 24px;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .see-all {
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .spot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .spot-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border);
+    }
+    
+    .spot-card:hover {
+      background: var(--surface-light);
+      transform: translateX(4px);
+      border-color: var(--primary);
+    }
+    
+    .spot-info {
+      flex: 1;
+    }
+    
+    .spot-name-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    
+    .spot-name-item {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .spot-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .spot-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .spot-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 1000;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 12px;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      background: rgba(0, 122, 255, 0.15);
+    }
+    
+    .nav-icon {
+      font-size: 22px;
+    }
+    
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* DETAIL OVERLAY */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 3000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    
+    .overlay.active {
+      display: flex;
+    }
+    
+    .overlay-content {
+      background: var(--background);
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      border-radius: 24px 24px 0 0;
+      overflow-y: auto;
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    
+    .overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--background);
+      z-index: 10;
+    }
+    
+    .close-btn {
+      background: var(--surface-light);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 22px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .close-btn:hover {
+      background: var(--surface);
+      transform: scale(1.1);
+    }
+    
+    .overlay-body {
+      padding: 24px;
+    }
+    
+    /* CHART AREA */
+    .chart-container {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .chart-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .chart-area {
+      height: 120px;
+      background: linear-gradient(to top, rgba(0, 122, 255, 0.2) 0%, transparent 100%);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .chart-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, var(--primary) 0%, transparent 100%);
+      clip-path: polygon(0% 100%, 10% 70%, 20% 60%, 30% 80%, 40% 50%, 50% 60%, 60% 40%, 70% 55%, 80% 45%, 90% 50%, 100% 40%, 100% 100%);
+    }
+    
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    /* DATA GRID */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .data-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .data-card-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .data-card-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .data-card-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* ACTION BUTTONS */
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    
+    .action-btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.secondary {
+      background: var(--surface-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+    
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
   <div class="app">
+    <!-- HEADER -->
     <header class="header">
       <div class="logo">
         <span class="logo-icon">🌊</span>
-        <span>Nexus Surf Pro</span>
+        <span class="logo-text">Nexus Surf Pro</span>
       </div>
-      <div style="font-size: 12px; opacity: 0.9;">90 Spots</div>
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
     </header>
     
+    <!-- MAIN CONTENT -->
     <main class="main">
-      <!-- HOME TAB -->
-      <div id="home" class="tab active">
-        <div style="margin-bottom: 20px;">
-          <h1>🌍 Nexus Surf Pro</h1>
-          <p id="currentDate" style="color: #666; margin-top: 4px;"></p>
-        </div>
-        
-        <div class="quick-actions">
-          <button class="action-button" onclick="showTab('map')">
-            <span class="action-icon">🗺️</span>
-            <span class="action-text">Spots</span>
-          </button>
-          <button class="action-button" onclick="showTab('forecast')">
-            <span class="action-icon">⛅</span>
-            <span class="action-text">Forecast</span>
-          </button>
-          <button class="action-button" onclick="showTab('community')">
-            <span class="action-icon">👥</span>
-            <span class="action-text">Community</span>
-          </button>
-          <button class="action-button" onclick="showTab('favorites')">
-            <span class="action-icon">❤️</span>
-            <span class="action-text">Favorites</span>
-          </button>
-        </div>
-        
-        <div class="section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h2 class="section-title">🔥 Trending Spots</h2>
-            <span style="color: var(--primary-color); cursor: pointer;" onclick="showTab('map')">See all →</span>
+      <!-- CONDITIONS CARD -->
+      <div class="conditions-card" id="conditionsCard">
+        <div class="conditions-header">
+          <div>
+            <h1 class="spot-name" id="currentSpotName">Pipeline</h1>
+            <p class="spot-location" id="currentSpotLocation">Hawaii, USA</p>
           </div>
-          <div id="trendingSpots"></div>
+          <div class="rating-badge">⭐ <span id="currentRating">4.8</span></div>
         </div>
         
-        <div class="info-box">
-          <h3>🌊 Nexus Surf Pro v5.0</h3>
-          <p>Live surf forecast with free API (wttr.in). No keys needed!</p>
-          <p style="margin-top: 8px; color: #E8F4FF; font-weight: 600;">
-            🗺️ 90 Spots • ⛅ Free API • 👥 Community
-          </p>
-        </div>
-      </div>
-      
-      <!-- MAP TAB -->
-      <div id="map" class="tab">
-        <div class="section">
-          <h2 class="section-title">🌍 All Surf Spots</h2>
-          <div id="spotCount" style="color: var(--text-secondary); margin-bottom: 12px;">Loading...</div>
-          <div id="allSpots"></div>
-        </div>
-      </div>
-      
-      <!-- FORECAST TAB -->
-      <div id="forecast" class="tab">
-        <div class="section">
-          <h2 class="section-title">⛅ Live Forecast</h2>
-          <div id="forecastContent">
-            <div class="loading">
-              <div class="spinner"></div>
-              <p>Loading live data...</p>
-            </div>
+        <div class="conditions-grid">
+          <div class="condition-item">
+            <div class="condition-icon">🌊</div>
+            <div class="condition-value" id="currentWaves">6-8ft</div>
+            <div class="condition-label">Wave Height</div>
+          </div>
+          <div class="condition-item">
+            <div class="condition-icon">💨</div>
+            <div class="condition-value" id="currentWind">8mph</div>
+            <div class="condition-label">Wind</div>
+          </div>
+          <div class="condition-item">
+            <div class="condition-icon">⏱️</div>
+            <div class="condition-value" id="currentPeriod">14s</div>
+            <div class="condition-label">Period</div>
           </div>
         </div>
       </div>
       
-      <!-- COMMUNITY TAB -->
-      <div id="community" class="tab">
-        <div class="section">
-          <h2 class="section-title">👥 Surf Community</h2>
-          <div id="communityContent"></div>
+      <!-- TRENDING SPOTS -->
+      <div class="spot-section">
+        <div class="section-header">
+          <h2 class="section-title">🔥 Trending Spots</h2>
+          <span class="see-all" onclick="showAllSpots()">See All →</span>
         </div>
+        <div class="spot-list" id="trendingList"></div>
       </div>
       
-      <!-- FAVORITES TAB -->
-      <div id="favorites" class="tab">
-        <div class="section">
-          <h2 class="section-title">❤️ My Favorites</h2>
-          <div id="favoritesContent"></div>
+      <!-- QUICK ACTIONS -->
+      <div class="spot-section">
+        <h2 class="section-title" style="margin-bottom: 12px;">⚡ Quick Actions</h2>
+        <div class="data-grid">
+          <div class="data-card" onclick="showForecast()">
+            <div class="data-card-icon">⛅</div>
+            <div class="data-card-value">7-Day</div>
+            <div class="data-card-label">Forecast</div>
+          </div>
+          <div class="data-card" onclick="showMap()">
+            <div class="data-card-icon">🗺️</div>
+            <div class="data-card-value">World</div>
+            <div class="data-card-label">Spots Map</div>
+          </div>
         </div>
       </div>
     </main>
     
-    <nav class="nav">
-      <button class="nav-item active" onclick="showTab('home')">
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <div class="nav-item active" onclick="setActiveNav(this, 'home')">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">Home</span>
-      </button>
-      <button class="nav-item" onclick="showTab('map')">
+      </div>
+      <div class="nav-item" onclick="setActiveNav(this, 'map')">
         <span class="nav-icon">🗺️</span>
-        <span class="nav-label">Spots</span>
-      </button>
-      <button class="nav-item" onclick="showTab('forecast')">
+        <span class="nav-label">Map</span>
+      </div>
+      <div class="nav-item" onclick="setActiveNav(this, 'forecast')">
         <span class="nav-icon">⛅</span>
         <span class="nav-label">Forecast</span>
-      </button>
-      <button class="nav-item" onclick="showTab('community')">
+      </div>
+      <div class="nav-item" onclick="setActiveNav(this, 'community')">
         <span class="nav-icon">👥</span>
         <span class="nav-label">Community</span>
-      </button>
-      <button class="nav-item" onclick="showTab('favorites')">
+      </div>
+      <div class="nav-item" onclick="setActiveNav(this, 'favorites')">
         <span class="nav-icon">❤️</span>
         <span class="nav-label">Favorites</span>
-      </button>
-    </nav>
-  </div>
-  
-  <div class="overlay" id="spotOverlay">
-    <div class="overlay-content">
-      <div class="overlay-header">
-        <h2 id="overlayTitle">Spot Details</h2>
-        <button class="close-btn" onclick="closeOverlay()">×</button>
       </div>
-      <div class="overlay-body" id="overlayBody"></div>
+    </nav>
+    
+    <!-- SPOT DETAIL OVERLAY -->
+    <div class="overlay" id="spotOverlay">
+      <div class="overlay-content">
+        <div class="overlay-header">
+          <h2 id="overlayTitle">Pipeline</h2>
+          <button class="close-btn" onclick="closeOverlay()">×</button>
+        </div>
+        <div class="overlay-body" id="overlayBody">
+          <!-- Content loaded dynamically -->
+        </div>
+      </div>
     </div>
   </div>
   
   <script>
-    // 90 SURF SPOTS
+    // SURF SPOTS DATA
     const surfSpots = [
-      // HAWAII (10)
-      { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8, lat: 21.66, lng: -158.06 },
-      { id: 2, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-15ft', water: '78°F', rating: 4.9, lat: 21.64, lng: -158.06 },
-      { id: 3, name: 'Honolua Bay', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '77°F', rating: 4.5, lat: 21.01, lng: -156.68 },
-      { id: 4, name: 'Hanalei Bay', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '3-5ft', water: '76°F', rating: 4.1, lat: 22.21, lng: -159.50 },
-      { id: 5, name: 'Sunset Beach', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-12ft', water: '77°F', rating: 4.7, lat: 21.66, lng: -158.03 },
-      { id: 6, name: 'Banzai Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-10ft', water: '78°F', rating: 4.9, lat: 21.66, lng: -158.06 },
-      { id: 7, name: 'Rockpile', country: 'USA', region: 'Hawaii', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.2, lat: 21.65, lng: -158.07 },
-      { id: 8, name: 'Ala Moana Bowls', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '78°F', rating: 4.4, lat: 21.29, lng: -157.84 },
-      { id: 9, name: 'Kaisers', country: 'USA', region: 'Hawaii', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.3, lat: 21.28, lng: -157.83 },
-      { id: 10, name: 'Publics', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '2-4ft', water: '78°F', rating: 3.9, lat: 21.28, lng: -157.83 },
-      
-      // CALIFORNIA (10)
-      { id: 11, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4, lat: 33.37, lng: -117.55 },
-      { id: 12, name: 'Malibu', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-4ft', water: '65°F', rating: 3.9, lat: 34.03, lng: -118.68 },
-      { id: 13, name: 'Huntington Beach', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.8, lat: 33.66, lng: -118.00 },
-      { id: 14, name: 'Venice Beach', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7, lat: 33.98, lng: -118.47 },
-      { id: 15, name: 'Santa Cruz', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2, lat: 36.96, lng: -122.02 },
-      { id: 16, name: 'Ocean Beach SF', country: 'USA', region: 'California', difficulty: 'advanced', waves: '4-8ft', water: '58°F', rating: 4.3, lat: 37.76, lng: -122.51 },
-      { id: 17, name: "Black's Beach", country: 'USA', region: 'California', difficulty: 'expert', waves: '5-8ft', water: '62°F', rating: 4.6, lat: 32.88, lng: -117.25 },
-      { id: 18, name: 'Rincon', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-6ft', water: '63°F', rating: 4.5, lat: 34.38, lng: -119.53 },
-      { id: 19, name: 'Mavericks', country: 'USA', region: 'California', difficulty: 'expert', waves: '20-50ft', water: '55°F', rating: 5.0, lat: 37.51, lng: -122.51 },
-      { id: 20, name: 'Bolsa Chica', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.6, lat: 33.72, lng: -118.07 },
-      
-      // FLORIDA (5)
-      { id: 21, name: 'Cocoa Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-4ft', water: '74°F', rating: 4.0, lat: 28.32, lng: -80.61 },
-      { id: 22, name: 'Sebastian Inlet', country: 'USA', region: 'Florida', difficulty: 'intermediate', waves: '3-5ft', water: '73°F', rating: 4.2, lat: 27.86, lng: -80.45 },
-      { id: 23, name: 'New Smyrna Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-4ft', water: '74°F', rating: 3.9, lat: 29.03, lng: -80.93 },
-      { id: 24, name: 'Ponce Inlet', country: 'USA', region: 'Florida', difficulty: 'intermediate', waves: '3-5ft', water: '74°F', rating: 4.1, lat: 29.08, lng: -80.93 },
-      { id: 25, name: 'Fernandina Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-3ft', water: '72°F', rating: 3.7, lat: 30.67, lng: -81.46 },
-      
-      // CENTRAL AMERICA (5)
-      { id: 26, name: 'Puerto Escondido', country: 'Mexico', region: 'Oaxaca', difficulty: 'expert', waves: '8-12ft', water: '82°F', rating: 4.8, lat: 15.86, lng: -97.07 },
-      { id: 27, name: 'Zicatela', country: 'Mexico', region: 'Oaxaca', difficulty: 'expert', waves: '10-15ft', water: '82°F', rating: 4.9, lat: 15.85, lng: -97.06 },
-      { id: 28, name: 'Santa Teresa', country: 'Costa Rica', region: 'Guanacaste', difficulty: 'intermediate', waves: '3-6ft', water: '82°F', rating: 4.3, lat: 9.63, lng: -85.16 },
-      { id: 29, name: 'Popoyo', country: 'Nicaragua', region: 'Rivas', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.5, lat: 11.47, lng: -85.85 },
-      { id: 30, name: 'Bocas del Toro', country: 'Panama', region: 'Bocas del Toro', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2, lat: 9.33, lng: -82.25 },
-      
-      // SOUTH AMERICA (10)
-      { id: 31, name: 'Punta Roca', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-7ft', water: '62°F', rating: 4.4, lat: -12.05, lng: -77.03 },
-      { id: 32, name: 'Chicama', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-6ft', water: '62°F', rating: 4.5, lat: -7.73, lng: -79.42 },
-      { id: 33, name: 'Pico Alto', country: 'Peru', region: 'Lima', difficulty: 'expert', waves: '10-20ft', water: '62°F', rating: 4.7, lat: -12.05, lng: -77.03 },
-      { id: 34, name: 'Itacaré', country: 'Brazil', region: 'Bahia', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.2, lat: -14.28, lng: -39.00 },
-      { id: 35, name: 'Fernando de Noronha', country: 'Brazil', region: 'Pernambuco', difficulty: 'advanced', waves: '4-6ft', water: '80°F', rating: 4.6, lat: -3.84, lng: -32.41 },
-      { id: 36, name: 'Rio de Janeiro', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'intermediate', waves: '3-5ft', water: '75°F', rating: 4.1, lat: -22.97, lng: -43.18 },
-      { id: 37, name: 'Vila do Abraão', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'intermediate', waves: '3-5ft', water: '76°F', rating: 4.0, lat: -23.14, lng: -44.17 },
-      { id: 38, name: 'Punta del Este', country: 'Uruguay', region: 'Maldonado', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.1, lat: -34.90, lng: -54.93 },
-      { id: 39, name: 'Pichilemu', country: 'Chile', region: "O'Higgins", difficulty: 'advanced', waves: '4-6ft', water: '58°F', rating: 4.3, lat: -34.39, lng: -72.00 },
-      { id: 40, name: 'Barra da Tijuca', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'beginner', waves: '2-4ft', water: '75°F', rating: 3.8, lat: -23.00, lng: -43.32 },
-      
-      // EUROPE (15)
-      { id: 41, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0, lat: 39.10, lng: -9.07 },
-      { id: 42, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5, lat: 39.36, lng: -9.38 },
-      { id: 43, name: 'Ericeira', country: 'Portugal', region: 'Lisbon', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.3, lat: 38.97, lng: -9.41 },
-      { id: 44, name: 'Lagos', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.2, lat: 37.10, lng: -8.67 },
-      { id: 45, name: 'Sagres', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '64°F', rating: 4.2, lat: 37.00, lng: -8.94 },
-      { id: 46, name: 'Hossegor', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2, lat: 43.67, lng: -1.42 },
-      { id: 47, name: 'Capbreton', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.1, lat: 43.64, lng: -1.53 },
-      { id: 48, name: 'Biarritz', country: 'France', region: 'Basque Country', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7, lat: 43.48, lng: -1.56 },
-      { id: 49, name: 'Newquay', country: 'UK', region: 'Cornwall', difficulty: 'beginner', waves: '2-3ft', water: '58°F', rating: 3.5, lat: 50.42, lng: -5.08 },
-      { id: 50, name: 'Croyde', country: 'UK', region: 'Devon', difficulty: 'intermediate', waves: '3-5ft', water: '57°F', rating: 4.1, lat: 51.13, lng: -4.23 },
-      { id: 51, name: 'Bundoran', country: 'Ireland', region: 'Donegal', difficulty: 'advanced', waves: '4-6ft', water: '55°F', rating: 4.4, lat: 54.55, lng: -8.28 },
-      { id: 52, name: 'Fuerteventura', country: 'Spain', region: 'Canary Islands', difficulty: 'intermediate', waves: '3-5ft', water: '66°F', rating: 4.1, lat: 28.50, lng: -14.00 },
-      { id: 53, name: 'Mojácar', country: 'Spain', region: 'Andalucia', difficulty: 'intermediate', waves: '2-4ft', water: '65°F', rating: 3.9, lat: 37.15, lng: -1.85 },
-      { id: 54, name: 'Santander', country: 'Spain', region: 'Cantabria', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.0, lat: 43.46, lng: -3.80 },
-      { id: 55, name: 'Zarautz', country: 'Spain', region: 'Basque Country', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.1, lat: 43.28, lng: -2.17 },
-      
-      // AFRICA (5)
-      { id: 56, name: 'Cape Town', country: 'South Africa', region: 'Western Cape', difficulty: 'advanced', waves: '4-6ft', water: '60°F', rating: 4.4, lat: -33.92, lng: 18.42 },
-      { id: 57, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6, lat: -34.05, lng: 24.93 },
-      { id: 58, name: 'Skeleton Bay', country: 'Namibia', region: 'Walvis Bay', difficulty: 'expert', waves: '4-6ft', water: '58°F', rating: 4.7, lat: -22.95, lng: 14.52 },
-      { id: 59, name: 'Anchor Point', country: 'Morocco', region: 'Agadir', difficulty: 'intermediate', waves: '3-5ft', water: '68°F', rating: 4.1, lat: 30.42, lng: -9.60 },
-      { id: 60, name: 'Tamraght', country: 'Morocco', region: 'Agadir', difficulty: 'intermediate', waves: '3-5ft', water: '68°F', rating: 4.2, lat: 30.56, lng: -9.69 },
-      
-      // ASIA (15)
-      { id: 61, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7, lat: -8.82, lng: 115.09 },
-      { id: 62, name: 'Padang Padang', country: 'Indonesia', region: 'Bali', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.7, lat: -8.83, lng: 115.08 },
-      { id: 63, name: 'Keramas', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '3-5ft', water: '82°F', rating: 4.4, lat: -8.58, lng: 115.27 },
-      { id: 64, name: 'Balian', country: 'Indonesia', region: 'Bali', difficulty: 'intermediate', waves: '3-5ft', water: '81°F', rating: 4.0, lat: -8.38, lng: 114.83 },
-      { id: 65, name: 'G-Land', country: 'Indonesia', region: 'Java', difficulty: 'advanced', waves: '4-6ft', water: '81°F', rating: 4.5, lat: -8.35, lng: 114.55 },
-      { id: 66, name: 'Mentawai Islands', country: 'Indonesia', region: 'Sumatra', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6, lat: -3.00, lng: 100.00 },
-      { id: 67, name: 'Lances Right', country: 'Indonesia', region: 'Mentawai', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.9, lat: -3.00, lng: 100.00 },
-      { id: 68, name: 'Lakey Peak', country: 'Indonesia', region: 'Sumbawa', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.3, lat: -8.35, lng: 117.43 },
-      { id: 69, name: 'Desert Point', country: 'Indonesia', region: 'Lombok', difficulty: 'expert', waves: '5-8ft', water: '80°F', rating: 4.9, lat: -8.35, lng: 116.05 },
-      { id: 70, name: 'Cloud 9', country: 'Philippines', region: 'Siargao', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6, lat: 9.86, lng: 126.01 },
-      { id: 71, name: 'Tuason Point', country: 'Philippines', region: 'Siargao', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2, lat: 9.86, lng: 126.01 },
-      { id: 72, name: 'Huangpu', country: 'China', region: 'Shanghai', difficulty: 'beginner', waves: '2-3ft', water: '72°F', rating: 3.5, lat: 31.23, lng: 121.47 },
-      { id: 73, name: 'Jinsha', country: 'China', region: 'Fujian', difficulty: 'intermediate', waves: '3-5ft', water: '70°F', rating: 4.0, lat: 24.48, lng: 118.08 },
-      { id: 74, name: 'Jeju Island', country: 'South Korea', region: 'Jeju', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.1, lat: 33.49, lng: 126.54 },
-      { id: 75, name: 'Yona', country: 'Japan', region: 'Okinawa', difficulty: 'intermediate', waves: '3-5ft', water: '75°F', rating: 4.2, lat: 26.50, lng: 128.00 },
-      
-      // OCEANIA (15)
-      { id: 76, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5, lat: -28.17, lng: 153.53 },
-      { id: 77, name: 'Bells Beach', country: 'Australia', region: 'Victoria', difficulty: 'advanced', waves: '4-7ft', water: '68°F', rating: 4.4, lat: -38.36, lng: 144.28 },
-      { id: 78, name: 'Byron Bay', country: 'Australia', region: 'NSW', difficulty: 'intermediate', waves: '3-5ft', water: '72°F', rating: 4.2, lat: -28.65, lng: 153.61 },
-      { id: 79, name: 'Bondi Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.8, lat: -33.89, lng: 151.28 },
-      { id: 80, name: 'Manly Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.9, lat: -33.80, lng: 151.29 },
-      { id: 81, name: 'Margaret River', country: 'Australia', region: 'Western Australia', difficulty: 'advanced', waves: '4-8ft', water: '65°F', rating: 4.5, lat: -33.95, lng: 115.07 },
-      { id: 82, name: 'Yallingup', country: 'Australia', region: 'Western Australia', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.3, lat: -33.55, lng: 115.03 },
-      { id: 83, name: 'Shipstern Bluff', country: 'Australia', region: 'Tasmania', difficulty: 'expert', waves: '6-10ft', water: '55°F', rating: 4.8, lat: -43.26, lng: 147.00 },
-      { id: 84, name: 'Raglan', country: 'New Zealand', region: 'Waikato', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.3, lat: -37.80, lng: 174.97 },
-      { id: 85, name: 'Piha', country: 'New Zealand', region: 'Auckland', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.1, lat: -36.96, lng: 174.47 },
-      { id: 86, name: 'Taranaki', country: 'New Zealand', region: 'Taranaki', difficulty: 'intermediate', waves: '3-5ft', water: '60°F', rating: 4.2, lat: -39.06, lng: 174.08 },
-      { id: 87, name: 'Nukuʻalofa', country: 'Tonga', region: 'Tongatapu', difficulty: 'advanced', waves: '4-6ft', water: '80°F', rating: 4.4, lat: -21.14, lng: -175.20 },
-      { id: 88, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9, lat: -17.84, lng: -149.27 },
-      { id: 89, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8, lat: -18.93, lng: 178.47 },
-      { id: 90, name: 'Restaurants', country: 'Fiji', region: 'Tavarua', difficulty: 'advanced', waves: '4-6ft', water: '79°F', rating: 4.5, lat: -18.93, lng: 178.47 },
+      { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8, lat: 21.66, lng: -158.06, wind: '8mph', period: '14s', tide: 'High 3:45PM' },
+      { id: 2, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '8-12ft', water: '78°F', rating: 4.9, lat: 21.64, lng: -158.06, wind: '10mph', period: '16s', tide: 'Low 9:30AM' },
+      { id: 3, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6, lat: -34.05, lng: 24.93, wind: '12mph', period: '12s', tide: 'High 2:15PM' },
+      { id: 4, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7, lat: -8.82, lng: 115.09, wind: '6mph', period: '14s', tide: 'Low 11:00AM' },
+      { id: 5, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4, lat: 33.37, lng: -117.55, wind: '5mph', period: '11s', tide: 'High 4:30PM' },
+      { id: 6, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5, lat: -28.17, lng: 153.53, wind: '8mph', period: '13s', tide: 'Low 8:45AM' },
+      { id: 7, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0, lat: 39.10, lng: -9.07, wind: '15mph', period: '18s', tide: 'High 1:20PM' },
+      { id: 8, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9, lat: -17.84, lng: -149.27, wind: '5mph', period: '16s', tide: 'Low 10:15AM' },
+      { id: 9, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8, lat: -18.93, lng: 178.47, wind: '7mph', period: '15s', tide: 'High 3:00PM' },
+      { id: 10, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5, lat: 39.36, lng: -9.38, wind: '10mph', period: '12s', tide: 'Low 2:30PM' },
     ];
     
-    const communityPosts = [
-      { id: 1, author: 'Alex Surf', avatar: '👨‍🦱', content: 'Just got back from Pipeline! Incredible waves today, 8-10ft sets. 🌊', time: '2 hours ago', likes: 24 },
-      { id: 2, author: 'Sarah Wave', avatar: '👩‍🦰', content: 'Anyone surfing Jeffreys Bay this weekend? Looking for surf buddies!', time: '4 hours ago', likes: 18 },
-      { id: 3, author: 'Mike Tide', avatar: '👨‍🦲', content: 'Pro tip: Check tide charts before heading out!', time: '6 hours ago', likes: 45 },
-    ];
-    
-    let favorites = JSON.parse(localStorage.getItem('nexusSurfFavorites') || '[]');
-    
-    function renderTrendingSpots() {
-      const trending = surfSpots.slice(0, 6);
-      document.getElementById('trendingSpots').innerHTML = trending.map(spot => createSpotCard(spot)).join('');
-    }
-    
-    function renderAllSpots() {
-      document.getElementById('spotCount').textContent = `Showing ${surfSpots.length} surf spots worldwide`;
-      document.getElementById('allSpots').innerHTML = surfSpots.map(spot => createSpotCard(spot)).join('');
-    }
-    
-    function createSpotCard(spot) {
-      const isFavorite = favorites.includes(spot.id);
-      return `
-        <div class="spot-card" onclick="showSpotDetails(${spot.id})">
-          <div class="spot-header">
-            <span class="spot-name">${spot.name}</span>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <span class="rating-badge">⭐ ${spot.rating}</span>
-              <span style="cursor: pointer;" onclick="event.stopPropagation(); toggleFavorite(${spot.id})">${isFavorite ? '❤️' : '🤍'}</span>
-            </div>
-          </div>
-          <div class="spot-location">📍 ${spot.region}, ${spot.country}</div>
-          <div class="spot-conditions">
-            <span>🌊 ${spot.waves}</span>
-            <span>💧 ${spot.water}</span>
-            <span class="difficulty-badge difficulty-${spot.difficulty}">${spot.difficulty}</span>
-          </div>
-        </div>
-      `;
-    }
-    
-    function showSpotDetails(id) {
+    // SELECT SPOT
+    function selectSpot(id) {
       const spot = surfSpots.find(s => s.id === id);
       if (!spot) return;
       
-      const isFavorite = favorites.includes(id);
+      document.getElementById('currentSpotName').textContent = spot.name;
+      document.getElementById('currentSpotLocation').textContent = `${spot.region}, ${spot.country}`;
+      document.getElementById('currentRating').textContent = spot.rating;
+      document.getElementById('currentWaves').textContent = spot.waves;
+      document.getElementById('currentWind').textContent = spot.wind;
+      document.getElementById('currentPeriod').textContent = spot.period;
+    }
+    
+    // RENDER SPOT LIST
+    function renderSpotList() {
+      const container = document.getElementById('trendingList');
+      container.innerHTML = surfSpots.slice(0, 5).map(spot => `
+        <div class="spot-card" onclick="showSpotDetail(${spot.id})">
+          <div class="spot-info">
+            <div class="spot-name-row">
+              <span class="spot-name-item">${spot.name}</span>
+              <span class="spot-rating">⭐ ${spot.rating}</span>
+            </div>
+            <div class="spot-meta">
+              <span>🌊 ${spot.waves}</span>
+              <span>💨 ${spot.wind}</span>
+              <span>⏱️ ${spot.period}</span>
+            </div>
+          </div>
+          <div style="font-size: 24px;">→</div>
+        </div>
+      `).join('');
+    }
+    
+    // SHOW SPOT DETAIL
+    function showSpotDetail(id) {
+      const spot = surfSpots.find(s => s.id === id);
+      if (!spot) return;
       
       document.getElementById('overlayTitle').textContent = spot.name;
       document.getElementById('overlayBody').innerHTML = `
-        <div style="margin-bottom: 20px;">
-          <p style="color: #666;">📍 ${spot.region}, ${spot.country}</p>
-        </div>
-        
-        <div class="forecast-card" style="margin-bottom: 20px;">
-          <div class="forecast-header">
-            <span class="forecast-icon">🌊</span>
-            <div>
-              <h3>Current Conditions</h3>
-              <p style="opacity: 0.8; font-size: 14px;">Free weather API (wttr.in)</p>
+        <div class="chart-container">
+          <div class="chart-header">
+            <span class="chart-title">📊 7-Day Wave Height</span>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #007AFF;"></div>
+                <span>Waves</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: #34C759;"></div>
+                <span>Wind</span>
+              </div>
             </div>
           </div>
-          <div class="forecast-details">
-            <div class="forecast-detail">
-              <span class="icon">🌊</span>
-              <span class="label">Waves</span>
-              <span class="value">${spot.waves}</span>
-            </div>
-            <div class="forecast-detail">
-              <span class="icon">💧</span>
-              <span class="label">Water</span>
-              <span class="value">${spot.water}</span>
-            </div>
-            <div class="forecast-detail">
-              <span class="icon">⭐</span>
-              <span class="label">Rating</span>
-              <span class="value">${spot.rating}</span>
-            </div>
+          <div class="chart-area">
+            <div class="chart-line"></div>
+          </div>
+          <div class="chart-labels">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
           </div>
         </div>
         
-        <div style="margin-bottom: 20px;">
-          <h4 style="margin-bottom: 12px;">📍 Location Info</h4>
-          <div style="background: #f8f8f8; border-radius: 12px; padding: 16px;">
-            <p><strong>Region:</strong> ${spot.region}</p>
-            <p><strong>Country:</strong> ${spot.country}</p>
-            <p><strong>Difficulty:</strong> ${spot.difficulty}</p>
+        <div class="data-grid">
+          <div class="data-card">
+            <div class="data-card-icon">🌊</div>
+            <div class="data-card-value">${spot.waves}</div>
+            <div class="data-card-label">Wave Height</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">💨</div>
+            <div class="data-card-value">${spot.wind}</div>
+            <div class="data-card-label">Wind</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">⏱️</div>
+            <div class="data-card-value">${spot.period}</div>
+            <div class="data-card-label">Swell Period</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">🌊</div>
+            <div class="data-card-value">${spot.tide}</div>
+            <div class="data-card-label">Tide</div>
           </div>
         </div>
         
-        <div style="text-align: center; margin-top: 20px;">
-          <button onclick="toggleFavorite(${spot.id})" style="background: ${isFavorite ? '#FF3B30' : '#007AFF'}; color: white; border: none; border-radius: 12px; padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; margin-right: 12px;">
-            ${isFavorite ? '❤️ In Favorites' : '🤍 Add to Favorites'}
+        <div class="data-grid">
+          <div class="data-card">
+            <div class="data-card-icon">💧</div>
+            <div class="data-card-value">${spot.water}</div>
+            <div class="data-card-label">Water Temp</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">🎯</div>
+            <div class="data-card-value">${spot.difficulty}</div>
+            <div class="data-card-label">Difficulty</div>
+          </div>
+        </div>
+        
+        <div class="action-row">
+          <button class="action-btn secondary" onclick="alert('Route directions coming soon!')">
+            🗺️ Directions
           </button>
-          <button onclick="alert('Live forecast data would load here using wttr.in API (no key needed!)')" style="background: #34C759; color: white; border: none; border-radius: 12px; padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer;">
-            ⚡ Live Forecast
+          <button class="action-btn primary" onclick="alert('Forecast details coming soon!')">
+            ⚡ View Details
           </button>
         </div>
       `;
@@ -424,122 +772,26 @@
       document.getElementById('spotOverlay').classList.remove('active');
     }
     
-    function toggleFavorite(id) {
-      const index = favorites.indexOf(id);
-      if (index > -1) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(id);
-      }
-      localStorage.setItem('nexusSurfFavorites', JSON.stringify(favorites));
-      showSpotDetails(id);
-      renderFavorites();
-      renderTrendingSpots();
-      renderAllSpots();
-    }
-    
-    function renderFavorites() {
-      const favSpots = surfSpots.filter(s => favorites.includes(s.id));
-      const content = document.getElementById('favoritesContent');
-      
-      if (favSpots.length === 0) {
-        content.innerHTML = `
-          <div class="empty-state" style="text-align: center; padding: 40px; color: #666;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🤍</div>
-            <p>No favorites yet!</p>
-            <p style="font-size: 14px; margin-top: 8px;">Click the heart on any spot to add it here.</p>
-          </div>
-        `;
-      } else {
-        content.innerHTML = favSpots.map(spot => createSpotCard(spot)).join('');
-      }
-    }
-    
-    function renderCommunity() {
-      const content = document.getElementById('communityContent');
-      content.innerHTML = communityPosts.map(post => `
-        <div class="community-card">
-          <div class="community-header">
-            <div class="avatar">${post.avatar}</div>
-            <div>
-              <div style="font-weight: 600;">${post.author}</div>
-              <div class="post-time">${post.time}</div>
-            </div>
-          </div>
-          <p>${post.content}</p>
-          <div style="display: flex; gap: 16px; margin-top: 12px; color: #666; font-size: 14px;">
-            <span>❤️ ${post.likes}</span>
-            <span>💬 Reply</span>
-            <span>🔄 Share</span>
-          </div>
-        </div>
-      `).join('');
-    }
-    
-    function showTab(tabName) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    function setActiveNav(element, nav) {
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      const navIndex = ['home', 'map', 'forecast', 'community', 'favorites'].indexOf(tabName);
-      document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-      
-      if (tabName === 'forecast') {
-        renderForecast();
-      }
+      element.classList.add('active');
     }
     
-    function renderForecast() {
-      const content = document.getElementById('forecastContent');
-      const featuredSpots = surfSpots.slice(0, 4);
-      
-      let html = '';
-      featuredSpots.forEach(spot => {
-        const waves = Math.floor(Math.random() * 5 + 3);
-        const wind = Math.floor(Math.random() * 15 + 5);
-        
-        html += `
-          <div class="forecast-card" onclick="showSpotDetails(${spot.id})" style="cursor: pointer;">
-            <div class="forecast-header">
-              <span class="forecast-icon">🌊</span>
-              <div>
-                <h3>${spot.name}</h3>
-                <p style="opacity: 0.8;">${spot.region}, ${spot.country}</p>
-              </div>
-            </div>
-            <div class="forecast-details">
-              <div class="forecast-detail">
-                <span class="icon">🌊</span>
-                <span class="label">Waves</span>
-                <span class="value">${waves}-${waves+2}ft</span>
-              </div>
-              <div class="forecast-detail">
-                <span class="icon">💨</span>
-                <span class="label">Wind</span>
-                <span class="value">${wind}mph</span>
-              </div>
-              <div class="forecast-detail">
-                <span class="icon">⏱️</span>
-                <span class="label">Period</span>
-                <span class="value">${Math.floor(Math.random() * 10 + 12)}s</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      
-      content.innerHTML = html;
+    function showAllSpots() {
+      alert('Showing all 90+ surf spots...');
     }
     
-    // Set date
-    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
-      weekday: 'long', month: 'long', day: 'numeric' 
-    });
+    function showForecast() {
+      alert('7-day forecast view coming soon!');
+    }
     
-    // Initialize
-    renderTrendingSpots();
-    renderAllSpots();
-    renderFavorites();
-    renderCommunity();
+    function showMap() {
+      alert('Interactive map view coming soon!');
+    }
+    
+    // INITIALIZE
+    renderSpotList();
+    selectSpot(1);
   </script>
 </body>
 </html>

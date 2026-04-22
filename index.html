@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#007AFF" />
+    <meta name="description" content="Nexus Surf - Professional Surf Forecast App" />
+    <title>Nexus Surf - Professional Surf Forecast</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #F8F8F8;
+        color: #1a1a1a;
+      }
+      .app { max-width: 480px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+      .header { background: white; padding: 16px; border-bottom: 1px solid #E5E5EA; display: flex; justify-content: space-between; align-items: center; }
+      .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: bold; color: #007AFF; }
+      .logo-icon { font-size: 28px; }
+      .main { flex: 1; overflow-y: auto; padding: 16px; }
+      .nav { background: white; border-top: 1px solid #E5E5EA; display: flex; justify-content: space-around; padding: 12px; position: fixed; bottom: 0; width: 100%; max-width: 480px; }
+      .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; cursor: pointer; padding: 8px 16px; border-radius: 12px; }
+      .nav-item.active { background: #E8F4FF; color: #007AFF; }
+      .nav-icon { font-size: 22px; margin-bottom: 4px; }
+      .nav-label { font-size: 11px; font-weight: 600; color: #666; }
+      .nav-item.active .nav-label { color: #007AFF; }
+      .section { margin-bottom: 24px; }
+      .section-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
+      .spot-card { background: white; border: 1px solid #E5E5EA; border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; }
+      .spot-header { display: flex; justify-content: space-between; align-items: center; }
+      .spot-name { font-size: 18px; font-weight: bold; }
+      .rating-badge { background: #FFEBEE; padding: 4px 10px; border-radius: 12px; font-weight: bold; color: #FF3B30; }
+      .spot-location { font-size: 14px; color: #666; margin: 8px 0; }
+      .spot-conditions { display: flex; gap: 12px; font-size: 12px; color: #007AFF; font-weight: 600; }
+      .difficulty-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+      .difficulty-beginner { background: #E8F5E9; color: #2E7D32; }
+      .difficulty-intermediate { background: #FFF3E0; color: #E65100; }
+      .difficulty-advanced { background: #FFEBEE; color: #C62828; }
+      .difficulty-expert { background: #FFDDEE; color: #C2185B; }
+      .action-button { display: flex; flex-direction: column; align-items: center; background: white; border: 1px solid #E5E5EA; border-radius: 16px; padding: 16px 8px; cursor: pointer; }
+      .action-icon { font-size: 28px; margin-bottom: 6px; }
+      .action-text { font-size: 11px; font-weight: 600; }
+      .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+      .feature-card { display: flex; align-items: center; background: white; border: 1px solid #E5E5EA; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+      .feature-icon { font-size: 28px; margin-right: 16px; }
+      .feature-info { flex: 1; }
+      .feature-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+      .feature-desc { font-size: 14px; color: #666; }
+      .feature-status { font-size: 14px; font-weight: bold; padding: 6px 12px; border-radius: 12px; }
+      .status-ready { background: #E8F5E9; color: #2E7D32; }
+      .status-building { background: #FFF3E0; color: #E65100; }
+      .screen { animation: fadeIn 0.3s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .map-view { background: #E8F4FF; border-radius: 16px; padding: 80px 20px; text-align: center; margin-bottom: 24px; }
+      .map-icon { font-size: 64px; display: block; margin-bottom: 16px; }
+      .forecast-card { background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%); border-radius: 20px; padding: 24px; color: white; margin-bottom: 24px; }
+      .forecast-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+      .forecast-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .community-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+      .stat-card { background: white; border: 1px solid #E5E5EA; border-radius: 12px; padding: 16px; text-align: center; }
+      .stat-number { display: block; font-size: 18px; font-weight: bold; color: #007AFF; margin-bottom: 4px; }
+      .stat-label { font-size: 12px; color: #666; }
+      .info-box { background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%); border-radius: 20px; padding: 24px; color: white; text-align: center; margin-bottom: 80px; }
+      .info-box h3 { font-size: 24px; margin-bottom: 12px; }
+      .info-box p { font-size: 14px; opacity: 0.9; }
+      .tab { display: none; }
+      .tab.active { display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="logo">
+          <span class="logo-icon">🌊</span>
+          <span>Nexus Surf</span>
+        </div>
+        <div class="theme-toggle">🌙</div>
+      </header>
+      
+      <main class="main">
+        <!-- HOME TAB -->
+        <div id="home" class="tab active screen">
+          <div class="header">
+            <div>
+              <h1 class="greeting">Good morning, Surfer! 🌊</h1>
+              <p class="date" id="currentDate"></p>
+            </div>
+          </div>
+          
+          <div class="quick-stats">
+            <div class="stat-card">
+              <span class="stat-number">40+</span>
+              <span class="stat-label">Surf Spots</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">24/7</span>
+              <span class="stat-label">Live Data</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">Free</span>
+              <span class="stat-label">API Access</span>
+            </div>
+          </div>
+          
+          <div class="quick-actions">
+            <button class="action-button" onclick="showTab('forecast')">
+              <span class="action-icon">⛅</span>
+              <span class="action-text">Forecast</span>
+            </button>
+            <button class="action-button" onclick="showTab('map')">
+              <span class="action-icon">🗺️</span>
+              <span class="action-text">Spots</span>
+            </button>
+            <button class="action-button" onclick="showTab('community')">
+              <span class="action-icon">👥</span>
+              <span class="action-text">Community</span>
+            </button>
+            <button class="action-button" onclick="showTab('profile')">
+              <span class="action-icon">👤</span>
+              <span class="action-text">Profile</span>
+            </button>
+          </div>
+          
+          <div class="section">
+            <h2 class="section-title">✨ Features Ready</h2>
+            <div class="feature-card">
+              <span class="feature-icon">🗺️</span>
+              <div class="feature-info">
+                <h3 class="feature-title">Interactive Map</h3>
+                <p class="feature-desc">40+ surf spots worldwide</p>
+              </div>
+              <span class="feature-status status-ready">✓ Ready</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">⛅</span>
+              <div class="feature-info">
+                <h3 class="feature-title">Live Forecast</h3>
+                <p class="feature-desc">Wave height, wind, tides</p>
+              </div>
+              <span class="feature-status status-ready">✓ Ready</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">👥</span>
+              <div class="feature-info">
+                <h3 class="feature-title">Community</h3>
+                <p class="feature-desc">Connect with surfers globally</p>
+              </div>
+              <span class="feature-status status-ready">✓ Ready</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-header" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <h2 class="section-title">🏄 Featured Spots</h2>
+              <span onclick="showTab('map')" style="color: #007AFF; font-weight: 600; cursor: pointer;">See All</span>
+            </div>
+            
+            <div id="spotsList"></div>
+          </div>
+          
+          <div class="info-box">
+            <h3>🌐 Nexus Surf v2.0</h3>
+            <p>Professional surf forecast app with real-time data.</p>
+            <p style="margin-top: 8px; color: #E8F4FF; font-weight: 600;">Free API • 40+ Spots • Live Forecasts</p>
+          </div>
+        </div>
+        
+        <!-- MAP TAB -->
+        <div id="map" class="tab screen">
+          <div class="section">
+            <h2 class="section-title">🌍 Surf Spots Map</h2>
+            <div class="map-view">
+              <span class="map-icon">🗺️</span>
+              <p>Interactive surf spots map</p>
+              <p style="font-size: 14px; color: #666; margin-top: 8px;">Select a spot below to see details</p>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2 class="section-title">🏄 All Surf Spots (40+)</h2>
+            <div id="allSpotsList"></div>
+          </div>
+        </div>
+        
+        <!-- FORECAST TAB -->
+        <div id="forecast" class="tab screen">
+          <div class="section">
+            <h2 class="section-title">⛅ Live Forecast</h2>
+            <div class="forecast-card" id="forecastCard">
+              <div class="forecast-header">
+                <span style="font-size: 36px;">🌊</span>
+                <div>
+                  <h2>Pipeline, Hawaii</h2>
+                  <p style="opacity: 0.8;">Today's conditions</p>
+                </div>
+              </div>
+              <div class="forecast-details">
+                <div class="forecast-detail" style="text-align: center;">
+                  <span style="font-size: 24px;">🌊</span>
+                  <p style="font-size: 12px; opacity: 0.8;">Waves</p>
+                  <p style="font-weight: bold;">6-8ft</p>
+                </div>
+                <div class="forecast-detail" style="text-align: center;">
+                  <span style="font-size: 24px;">💨</span>
+                  <p style="font-size: 12px; opacity: 0.8;">Wind</p>
+                  <p style="font-weight: bold;">8mph NE</p>
+                </div>
+                <div class="forecast-detail" style="text-align: center;">
+                  <span style="font-size: 24px;">🌊</span>
+                  <p style="font-size: 12px; opacity: 0.8;">Tide</p>
+                  <p style="font-weight: bold;">High 3:45PM</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- COMMUNITY TAB -->
+        <div id="community" class="tab screen">
+          <div class="section">
+            <h2 class="section-title">👥 Surf Community</h2>
+            <div class="community-stats">
+              <div class="stat-card">
+                <span class="stat-number">12.5K</span>
+                <span class="stat-label">Members</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number">156</span>
+                <span class="stat-label">Spots</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number">842</span>
+                <span class="stat-label">Posts Today</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2 class="section-title">📋 Recent Posts</h2>
+            <div class="spot-card">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <span style="font-size: 32px;">👨‍🦱</span>
+                <div>
+                  <p style="font-weight: 600;">Alex Surf</p>
+                  <p style="font-size: 12px; color: #666;">2 hours ago</p>
+                </div>
+              </div>
+              <p>Just got back from Pipeline! Incredible waves today, 8-10ft sets. 🌊</p>
+            </div>
+            <div class="spot-card">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <span style="font-size: 32px;">👩‍🦰</span>
+                <div>
+                  <p style="font-weight: 600;">Sarah Wave</p>
+                  <p style="font-size: 12px; color: #666;">4 hours ago</p>
+                </div>
+              </div>
+              <p>Anyone surfing Jeffreys Bay this weekend? Looking for surf buddies!</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- PROFILE TAB -->
+        <div id="profile" class="tab screen">
+          <div class="section">
+            <h2 class="section-title">👤 Profile</h2>
+            <div class="spot-card">
+              <div style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+                <span style="font-size: 48px;">🏄‍♂️</span>
+                <div>
+                  <h2>Surfer John</h2>
+                  <p style="color: #666;">24 Surf Sessions • 5 Spots Explored</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2 class="section-title">📋 My Sessions</h2>
+            <div class="spot-card">
+              <div style="display: flex; justify-content: space-between;">
+                <div>
+                  <p style="font-weight: 600;">Pipeline, Hawaii</p>
+                  <p style="font-size: 12px; color: #666;">Apr 21, 2026</p>
+                </div>
+                <div style="text-align: right;">
+                  <p>⏱️ 2.5 hours</p>
+                  <p>⭐ 5/5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <nav class="nav">
+        <button class="nav-item active" onclick="showTab('home')">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" onclick="showTab('map')">
+          <span class="nav-icon">🗺️</span>
+          <span class="nav-label">Map</span>
+        </button>
+        <button class="nav-item" onclick="showTab('forecast')">
+          <span class="nav-icon">⛅</span>
+          <span class="nav-label">Forecast</span>
+        </button>
+        <button class="nav-item" onclick="showTab('community')">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Community</span>
+        </button>
+        <button class="nav-item" onclick="showTab('profile')">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+    
+    <script>
+      // Surf spots data
+      const surfSpots = [
+        { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8 },
+        { id: 2, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6 },
+        { id: 3, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7 },
+        { id: 4, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4 },
+        { id: 5, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5 },
+        { id: 6, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9 },
+        { id: 7, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0 },
+        { id: 8, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8 },
+        { id: 9, name: 'Mentawai', country: 'Indonesia', region: 'Sumatra', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6 },
+        { id: 10, name: 'Lagos', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.2 },
+        { id: 11, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5 },
+        { id: 12, name: 'Ericeira', country: 'Portugal', region: 'Lisbon', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.3 },
+        { id: 13, name: 'Bells Beach', country: 'Australia', region: 'Victoria', difficulty: 'advanced', waves: '4-7ft', water: '68°F', rating: 4.4 },
+        { id: 14, name: 'Byron Bay', country: 'Australia', region: 'NSW', difficulty: 'intermediate', waves: '3-5ft', water: '72°F', rating: 4.2 },
+        { id: 15, name: 'Bondi Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.8 },
+        { id: 16, name: 'Malibu', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-4ft', water: '65°F', rating: 3.9 },
+        { id: 17, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-15ft', water: '78°F', rating: 4.9 },
+        { id: 18, name: 'Honolua Bay', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '77°F', rating: 4.5 },
+        { id: 19, name: 'Hanalei Bay', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '3-5ft', water: '76°F', rating: 4.1 },
+        { id: 20, name: 'Skeleton Bay', country: 'Namibia', region: 'Walvis Bay', difficulty: 'expert', waves: '4-6ft', water: '58°F', rating: 4.7 },
+        { id: 21, name: 'Cape Town', country: 'South Africa', region: 'Western Cape', difficulty: 'advanced', waves: '4-6ft', water: '60°F', rating: 4.4 },
+        { id: 22, name: 'Hossegor', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2 },
+        { id: 23, name: 'Biarritz', country: 'France', region: 'Basque Country', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7 },
+        { id: 24, name: 'Newquay', country: 'UK', region: 'Cornwall', difficulty: 'beginner', waves: '2-3ft', water: '58°F', rating: 3.5 },
+        { id: 25, name: 'Fuerteventura', country: 'Spain', region: 'Canary Islands', difficulty: 'intermediate', waves: '3-5ft', water: '66°F', rating: 4.1 },
+        { id: 26, name: 'Sagres', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '64°F', rating: 4.2 },
+        { id: 27, name: 'Mojácar', country: 'Spain', region: 'Andalucia', difficulty: 'intermediate', waves: '2-4ft', water: '65°F', rating: 3.9 },
+        { id: 28, name: 'Raglan', country: 'New Zealand', region: 'Waikato', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.3 },
+        { id: 29, name: 'Punta Roca', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-7ft', water: '62°F', rating: 4.4 },
+        { id: 30, name: 'Lagos', country: 'Nigeria', region: 'Lagos State', difficulty: 'intermediate', waves: '2-4ft', water: '78°F', rating: 3.8 },
+        { id: 31, name: 'Margaret River', country: 'Australia', region: 'Western Australia', difficulty: 'advanced', waves: '4-8ft', water: '65°F', rating: 4.5 },
+        { id: 32, name: 'J-Bay Point', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6 },
+        { id: 33, name: 'Shipstern Bluff', country: 'Australia', region: 'Tasmania', difficulty: 'expert', waves: '6-10ft', water: '55°F', rating: 4.8 },
+        { id: 34, name: 'Ments Right', country: 'Indonesia', region: 'Mentawai', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.9 },
+        { id: 35, name: 'Keramas', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '3-5ft', water: '82°F', rating: 4.4 },
+        { id: 36, name: 'Lances Left', country: 'Indonesia', region: 'Mentawai', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2 },
+        { id: 37, name: 'G-Land', country: 'Indonesia', region: 'Java', difficulty: 'advanced', waves: '4-6ft', water: '81°F', rating: 4.5 },
+        { id: 38, name: 'Padang Padang', country: 'Indonesia', region: 'Bali', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.7 },
+        { id: 39, name: 'Balian', country: 'Indonesia', region: 'Bali', difficulty: 'intermediate', waves: '3-5ft', water: '81°F', rating: 4.0 },
+        { id: 40, name: 'Desert Point', country: 'Indonesia', region: 'Lombok', difficulty: 'expert', waves: '5-8ft', water: '80°F', rating: 4.9 }
+      ];
+      
+      // Render spots list
+      function renderSpots() {
+        const featuredSpots = surfSpots.slice(0, 5);
+        const allSpots = surfSpots;
+        
+        // Featured spots on home
+        document.getElementById('spotsList').innerHTML = featuredSpots.map(spot => `
+          <div class="spot-card" onclick="selectSpot(${spot.id})">
+            <div class="spot-header">
+              <span class="spot-name">${spot.name}</span>
+              <span class="rating-badge">⭐ ${spot.rating}</span>
+            </div>
+            <div class="spot-location">📍 ${spot.region}, ${spot.country}</div>
+            <div class="spot-conditions">
+              <span>🌊 ${spot.waves}</span>
+              <span>💧 ${spot.water}</span>
+              <span class="difficulty-badge difficulty-${spot.difficulty}">${spot.difficulty}</span>
+            </div>
+          </div>
+        `).join('');
+        
+        // All spots on map tab
+        document.getElementById('allSpotsList').innerHTML = allSpots.map(spot => `
+          <div class="spot-card" onclick="selectSpot(${spot.id})">
+            <div class="spot-header">
+              <span class="spot-name">${spot.name}</span>
+              <span class="rating-badge">⭐ ${spot.rating}</span>
+            </div>
+            <div class="spot-location">📍 ${spot.region}, ${spot.country}</div>
+            <div class="spot-conditions">
+              <span>🌊 ${spot.waves}</span>
+              <span>💧 ${spot.water}</span>
+              <span class="difficulty-badge difficulty-${spot.difficulty}">${spot.difficulty}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Select spot
+      function selectSpot(id) {
+        const spot = surfSpots.find(s => s.id === id);
+        if (spot) {
+          alert(`🌊 ${spot.name}\n📍 ${spot.region}, ${spot.country}\n🌊 Waves: ${spot.waves}\n💧 Water: ${spot.water}\n⭐ Rating: ${spot.rating}\n🎯 Difficulty: ${spot.difficulty}`);
+        }
+      }
+      
+      // Show tab
+      function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+        
+        // Update nav
+        const navIndex = ['home', 'map', 'forecast', 'community', 'profile'].indexOf(tabName);
+        document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+      }
+      
+      // Set date
+      document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      // Initialize
+      renderSpots();
+    </script>
+  </body>
+</html>

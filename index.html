@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#007AFF" />
     <meta name="description" content="Nexus Surf - Professional Surf Forecast App" />
-    <title>Nexus Surf - Professional Surf Forecast</title>
+    <title>Nexus Surf - 90+ Surf Spots Worldwide</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { 
@@ -31,7 +31,7 @@
       .spot-name { font-size: 18px; font-weight: bold; }
       .rating-badge { background: #FFEBEE; padding: 4px 10px; border-radius: 12px; font-weight: bold; color: #FF3B30; }
       .spot-location { font-size: 14px; color: #666; margin: 8px 0; }
-      .spot-conditions { display: flex; gap: 12px; font-size: 12px; color: #007AFF; font-weight: 600; }
+      .spot-conditions { display: flex; gap: 12px; font-size: 12px; color: #007AFF; font-weight: 600; flex-wrap: wrap; }
       .difficulty-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
       .difficulty-beginner { background: #E8F5E9; color: #2E7D32; }
       .difficulty-intermediate { background: #FFF3E0; color: #E65100; }
@@ -48,7 +48,6 @@
       .feature-desc { font-size: 14px; color: #666; }
       .feature-status { font-size: 14px; font-weight: bold; padding: 6px 12px; border-radius: 12px; }
       .status-ready { background: #E8F5E9; color: #2E7D32; }
-      .status-building { background: #FFF3E0; color: #E65100; }
       .screen { animation: fadeIn 0.3s ease-out; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .map-view { background: #E8F4FF; border-radius: 16px; padding: 80px 20px; text-align: center; margin-bottom: 24px; }
@@ -89,7 +88,7 @@
           
           <div class="quick-stats">
             <div class="stat-card">
-              <span class="stat-number">40+</span>
+              <span class="stat-number">90+</span>
               <span class="stat-label">Surf Spots</span>
             </div>
             <div class="stat-card">
@@ -127,7 +126,7 @@
               <span class="feature-icon">🗺️</span>
               <div class="feature-info">
                 <h3 class="feature-title">Interactive Map</h3>
-                <p class="feature-desc">40+ surf spots worldwide</p>
+                <p class="feature-desc">90+ surf spots worldwide</p>
               </div>
               <span class="feature-status status-ready">✓ Ready</span>
             </div>
@@ -151,7 +150,7 @@
           
           <div class="section">
             <div class="section-header" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <h2 class="section-title">🏄 Featured Spots</h2>
+              <h2 class="section-title">🏄 Featured Spots (90+ Total)</h2>
               <span onclick="showTab('map')" style="color: #007AFF; font-weight: 600; cursor: pointer;">See All</span>
             </div>
             
@@ -161,7 +160,7 @@
           <div class="info-box">
             <h3>🌐 Nexus Surf v2.0</h3>
             <p>Professional surf forecast app with real-time data.</p>
-            <p style="margin-top: 8px; color: #E8F4FF; font-weight: 600;">Free API • 40+ Spots • Live Forecasts</p>
+            <p style="margin-top: 8px; color: #E8F4FF; font-weight: 600;">Free API • 90+ Spots • Live Forecasts</p>
           </div>
         </div>
         
@@ -177,7 +176,7 @@
           </div>
           
           <div class="section">
-            <h2 class="section-title">🏄 All Surf Spots (40+)</h2>
+            <h2 class="section-title">🏄 All Surf Spots (90+)</h2>
             <div id="allSpotsList"></div>
           </div>
         </div>
@@ -318,48 +317,115 @@
     </div>
     
     <script>
-      // Surf spots data
+      // COMPLETE SURF SPOTS DATABASE - 90+ spots worldwide
       const surfSpots = [
+        // HAWAII (10 spots)
         { id: 1, name: 'Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-8ft', water: '78°F', rating: 4.8 },
-        { id: 2, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6 },
-        { id: 3, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7 },
-        { id: 4, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4 },
-        { id: 5, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5 },
-        { id: 6, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9 },
-        { id: 7, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0 },
-        { id: 8, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8 },
-        { id: 9, name: 'Mentawai', country: 'Indonesia', region: 'Sumatra', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6 },
-        { id: 10, name: 'Lagos', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.2 },
-        { id: 11, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5 },
-        { id: 12, name: 'Ericeira', country: 'Portugal', region: 'Lisbon', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.3 },
-        { id: 13, name: 'Bells Beach', country: 'Australia', region: 'Victoria', difficulty: 'advanced', waves: '4-7ft', water: '68°F', rating: 4.4 },
-        { id: 14, name: 'Byron Bay', country: 'Australia', region: 'NSW', difficulty: 'intermediate', waves: '3-5ft', water: '72°F', rating: 4.2 },
-        { id: 15, name: 'Bondi Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.8 },
-        { id: 16, name: 'Malibu', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-4ft', water: '65°F', rating: 3.9 },
-        { id: 17, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-15ft', water: '78°F', rating: 4.9 },
-        { id: 18, name: 'Honolua Bay', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '77°F', rating: 4.5 },
-        { id: 19, name: 'Hanalei Bay', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '3-5ft', water: '76°F', rating: 4.1 },
-        { id: 20, name: 'Skeleton Bay', country: 'Namibia', region: 'Walvis Bay', difficulty: 'expert', waves: '4-6ft', water: '58°F', rating: 4.7 },
-        { id: 21, name: 'Cape Town', country: 'South Africa', region: 'Western Cape', difficulty: 'advanced', waves: '4-6ft', water: '60°F', rating: 4.4 },
-        { id: 22, name: 'Hossegor', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2 },
-        { id: 23, name: 'Biarritz', country: 'France', region: 'Basque Country', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7 },
-        { id: 24, name: 'Newquay', country: 'UK', region: 'Cornwall', difficulty: 'beginner', waves: '2-3ft', water: '58°F', rating: 3.5 },
-        { id: 25, name: 'Fuerteventura', country: 'Spain', region: 'Canary Islands', difficulty: 'intermediate', waves: '3-5ft', water: '66°F', rating: 4.1 },
-        { id: 26, name: 'Sagres', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '64°F', rating: 4.2 },
-        { id: 27, name: 'Mojácar', country: 'Spain', region: 'Andalucia', difficulty: 'intermediate', waves: '2-4ft', water: '65°F', rating: 3.9 },
-        { id: 28, name: 'Raglan', country: 'New Zealand', region: 'Waikato', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.3 },
-        { id: 29, name: 'Punta Roca', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-7ft', water: '62°F', rating: 4.4 },
-        { id: 30, name: 'Lagos', country: 'Nigeria', region: 'Lagos State', difficulty: 'intermediate', waves: '2-4ft', water: '78°F', rating: 3.8 },
-        { id: 31, name: 'Margaret River', country: 'Australia', region: 'Western Australia', difficulty: 'advanced', waves: '4-8ft', water: '65°F', rating: 4.5 },
-        { id: 32, name: 'J-Bay Point', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6 },
-        { id: 33, name: 'Shipstern Bluff', country: 'Australia', region: 'Tasmania', difficulty: 'expert', waves: '6-10ft', water: '55°F', rating: 4.8 },
-        { id: 34, name: 'Ments Right', country: 'Indonesia', region: 'Mentawai', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.9 },
-        { id: 35, name: 'Keramas', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '3-5ft', water: '82°F', rating: 4.4 },
-        { id: 36, name: 'Lances Left', country: 'Indonesia', region: 'Mentawai', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2 },
-        { id: 37, name: 'G-Land', country: 'Indonesia', region: 'Java', difficulty: 'advanced', waves: '4-6ft', water: '81°F', rating: 4.5 },
-        { id: 38, name: 'Padang Padang', country: 'Indonesia', region: 'Bali', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.7 },
-        { id: 39, name: 'Balian', country: 'Indonesia', region: 'Bali', difficulty: 'intermediate', waves: '3-5ft', water: '81°F', rating: 4.0 },
-        { id: 40, name: 'Desert Point', country: 'Indonesia', region: 'Lombok', difficulty: 'expert', waves: '5-8ft', water: '80°F', rating: 4.9 }
+        { id: 2, name: 'Waimea Bay', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-15ft', water: '78°F', rating: 4.9 },
+        { id: 3, name: 'Honolua Bay', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '77°F', rating: 4.5 },
+        { id: 4, name: 'Hanalei Bay', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '3-5ft', water: '76°F', rating: 4.1 },
+        { id: 5, name: 'Sunset Beach', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-12ft', water: '77°F', rating: 4.7 },
+        { id: 6, name: 'Banzai Pipeline', country: 'USA', region: 'Hawaii', difficulty: 'expert', waves: '6-10ft', water: '78°F', rating: 4.9 },
+        { id: 7, name: 'Rockpile', country: 'USA', region: 'Hawaii', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.2 },
+        { id: 8, name: 'Ala Moana Bowls', country: 'USA', region: 'Hawaii', difficulty: 'advanced', waves: '4-6ft', water: '78°F', rating: 4.4 },
+        { id: 9, name: 'Kaisers', country: 'USA', region: 'Hawaii', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.3 },
+        { id: 10, name: 'Publics', country: 'USA', region: 'Hawaii', difficulty: 'beginner', waves: '2-4ft', water: '78°F', rating: 3.9 },
+
+        // CALIFORNIA (10 spots)
+        { id: 11, name: 'Trestles', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.4 },
+        { id: 12, name: 'Malibu', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-4ft', water: '65°F', rating: 3.9 },
+        { id: 13, name: 'Huntington Beach', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.8 },
+        { id: 14, name: 'Venice Beach', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7 },
+        { id: 15, name: 'Santa Cruz', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2 },
+        { id: 16, name: 'Ocean Beach SF', country: 'USA', region: 'California', difficulty: 'advanced', waves: '4-8ft', water: '58°F', rating: 4.3 },
+        { id: 17, name: "Black's Beach", country: 'USA', region: 'California', difficulty: 'expert', waves: '5-8ft', water: '62°F', rating: 4.6 },
+        { id: 18, name: 'Rincon', country: 'USA', region: 'California', difficulty: 'intermediate', waves: '3-6ft', water: '63°F', rating: 4.5 },
+        { id: 19, name: 'Mavericks', country: 'USA', region: 'California', difficulty: 'expert', waves: '20-50ft', water: '55°F', rating: 5.0 },
+        { id: 20, name: 'Bolsa Chica', country: 'USA', region: 'California', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.6 },
+
+        // FLORIDA (5 spots)
+        { id: 21, name: 'Cocoa Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-4ft', water: '74°F', rating: 4.0 },
+        { id: 22, name: 'Sebastian Inlet', country: 'USA', region: 'Florida', difficulty: 'intermediate', waves: '3-5ft', water: '73°F', rating: 4.2 },
+        { id: 23, name: 'New Smyrna Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-4ft', water: '74°F', rating: 3.9 },
+        { id: 24, name: 'Ponce Inlet', country: 'USA', region: 'Florida', difficulty: 'intermediate', waves: '3-5ft', water: '74°F', rating: 4.1 },
+        { id: 25, name: 'Fernandina Beach', country: 'USA', region: 'Florida', difficulty: 'beginner', waves: '2-3ft', water: '72°F', rating: 3.7 },
+
+        // CENTRAL AMERICA (5 spots)
+        { id: 26, name: 'Puerto Escondido', country: 'Mexico', region: 'Oaxaca', difficulty: 'expert', waves: '8-12ft', water: '82°F', rating: 4.8 },
+        { id: 27, name: 'Zicatela', country: 'Mexico', region: 'Oaxaca', difficulty: 'expert', waves: '10-15ft', water: '82°F', rating: 4.9 },
+        { id: 28, name: 'Santa Teresa', country: 'Costa Rica', region: 'Guanacaste', difficulty: 'intermediate', waves: '3-6ft', water: '82°F', rating: 4.3 },
+        { id: 29, name: 'Popoyo', country: 'Nicaragua', region: 'Rivas', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.5 },
+        { id: 30, name: 'Bocas del Toro', country: 'Panama', region: 'Bocas del Toro', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2 },
+
+        // SOUTH AMERICA (10 spots)
+        { id: 31, name: 'Punta Roca', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-7ft', water: '62°F', rating: 4.4 },
+        { id: 32, name: 'Chicama', country: 'Peru', region: 'Lima', difficulty: 'advanced', waves: '4-6ft', water: '62°F', rating: 4.5 },
+        { id: 33, name: 'Pico Alto', country: 'Peru', region: 'Lima', difficulty: 'expert', waves: '10-20ft', water: '62°F', rating: 4.7 },
+        { id: 34, name: 'Itacaré', country: 'Brazil', region: 'Bahia', difficulty: 'intermediate', waves: '3-5ft', water: '78°F', rating: 4.2 },
+        { id: 35, name: 'Fernando de Noronha', country: 'Brazil', region: 'Pernambuco', difficulty: 'advanced', waves: '4-6ft', water: '80°F', rating: 4.6 },
+        { id: 36, name: 'Rio de Janeiro', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'intermediate', waves: '3-5ft', water: '75°F', rating: 4.1 },
+        { id: 37, name: 'Vila do Abraão', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'intermediate', waves: '3-5ft', water: '76°F', rating: 4.0 },
+        { id: 38, name: 'Punta del Este', country: 'Uruguay', region: 'Maldonado', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.1 },
+        { id: 39, name: 'Pichilemu', country: 'Chile', region: "O'Higgins", difficulty: 'advanced', waves: '4-6ft', water: '58°F', rating: 4.3 },
+        { id: 40, name: 'Barra da Tijuca', country: 'Brazil', region: 'Rio de Janeiro', difficulty: 'beginner', waves: '2-4ft', water: '75°F', rating: 3.8 },
+
+        // EUROPE (15 spots)
+        { id: 41, name: 'Nazaré', country: 'Portugal', region: 'Lisbon', difficulty: 'expert', waves: '20-50ft', water: '62°F', rating: 5.0 },
+        { id: 42, name: 'Peniche', country: 'Portugal', region: 'Leiria', difficulty: 'advanced', waves: '4-6ft', water: '64°F', rating: 4.5 },
+        { id: 43, name: 'Ericeira', country: 'Portugal', region: 'Lisbon', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.3 },
+        { id: 44, name: 'Lagos', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.2 },
+        { id: 45, name: 'Sagres', country: 'Portugal', region: 'Algarve', difficulty: 'intermediate', waves: '3-5ft', water: '64°F', rating: 4.2 },
+        { id: 46, name: 'Hossegor', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.2 },
+        { id: 47, name: 'Capbreton', country: 'France', region: 'Nouvelle-Aquitaine', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.1 },
+        { id: 48, name: 'Biarritz', country: 'France', region: 'Basque Country', difficulty: 'beginner', waves: '2-3ft', water: '64°F', rating: 3.7 },
+        { id: 49, name: 'Newquay', country: 'UK', region: 'Cornwall', difficulty: 'beginner', waves: '2-3ft', water: '58°F', rating: 3.5 },
+        { id: 50, name: 'Croyde', country: 'UK', region: 'Devon', difficulty: 'intermediate', waves: '3-5ft', water: '57°F', rating: 4.1 },
+        { id: 51, name: 'Bundoran', country: 'Ireland', region: 'Donegal', difficulty: 'advanced', waves: '4-6ft', water: '55°F', rating: 4.4 },
+        { id: 52, name: 'Fuerteventura', country: 'Spain', region: 'Canary Islands', difficulty: 'intermediate', waves: '3-5ft', water: '66°F', rating: 4.1 },
+        { id: 53, name: 'Mojácar', country: 'Spain', region: 'Andalucia', difficulty: 'intermediate', waves: '2-4ft', water: '65°F', rating: 3.9 },
+        { id: 54, name: 'Santander', country: 'Spain', region: 'Cantabria', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.0 },
+        { id: 55, name: 'Zarautz', country: 'Spain', region: 'Basque Country', difficulty: 'intermediate', waves: '3-5ft', water: '63°F', rating: 4.1 },
+
+        // AFRICA (5 spots)
+        { id: 56, name: 'Cape Town', country: 'South Africa', region: 'Western Cape', difficulty: 'advanced', waves: '4-6ft', water: '60°F', rating: 4.4 },
+        { id: 57, name: 'Jeffreys Bay', country: 'South Africa', region: 'Eastern Cape', difficulty: 'advanced', waves: '4-6ft', water: '68°F', rating: 4.6 },
+        { id: 58, name: 'Skeleton Bay', country: 'Namibia', region: 'Walvis Bay', difficulty: 'expert', waves: '4-6ft', water: '58°F', rating: 4.7 },
+        { id: 59, name: 'Anchor Point', country: 'Morocco', region: 'Agadir', difficulty: 'intermediate', waves: '3-5ft', water: '68°F', rating: 4.1 },
+        { id: 60, name: 'Tamraght', country: 'Morocco', region: 'Agadir', difficulty: 'intermediate', waves: '3-5ft', water: '68°F', rating: 4.2 },
+
+        // ASIA (15 spots)
+        { id: 61, name: 'Uluwatu', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '4-7ft', water: '82°F', rating: 4.7 },
+        { id: 62, name: 'Padang Padang', country: 'Indonesia', region: 'Bali', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.7 },
+        { id: 63, name: 'Keramas', country: 'Indonesia', region: 'Bali', difficulty: 'advanced', waves: '3-5ft', water: '82°F', rating: 4.4 },
+        { id: 64, name: 'Balian', country: 'Indonesia', region: 'Bali', difficulty: 'intermediate', waves: '3-5ft', water: '81°F', rating: 4.0 },
+        { id: 65, name: 'G-Land', country: 'Indonesia', region: 'Java', difficulty: 'advanced', waves: '4-6ft', water: '81°F', rating: 4.5 },
+        { id: 66, name: 'Mentawai Islands', country: 'Indonesia', region: 'Sumatra', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6 },
+        { id: 67, name: 'Lances Right', country: 'Indonesia', region: 'Mentawai', difficulty: 'expert', waves: '4-8ft', water: '82°F', rating: 4.9 },
+        { id: 68, name: 'Lakey Peak', country: 'Indonesia', region: 'Sumbawa', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.3 },
+        { id: 69, name: 'Desert Point', country: 'Indonesia', region: 'Lombok', difficulty: 'expert', waves: '5-8ft', water: '80°F', rating: 4.9 },
+        { id: 70, name: 'Cloud 9', country: 'Philippines', region: 'Siargao', difficulty: 'advanced', waves: '4-6ft', water: '82°F', rating: 4.6 },
+        { id: 71, name: 'Tuason Point', country: 'Philippines', region: 'Siargao', difficulty: 'intermediate', waves: '3-5ft', water: '82°F', rating: 4.2 },
+        { id: 72, name: 'Huangpu', country: 'China', region: 'Shanghai', difficulty: 'beginner', waves: '2-3ft', water: '72°F', rating: 3.5 },
+        { id: 73, name: 'Jinsha', country: 'China', region: 'Fujian', difficulty: 'intermediate', waves: '3-5ft', water: '70°F', rating: 4.0 },
+        { id: 74, name: 'Jeju Island', country: 'South Korea', region: 'Jeju', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.1 },
+        { id: 75, name: 'Yona', country: 'Japan', region: 'Okinawa', difficulty: 'intermediate', waves: '3-5ft', water: '75°F', rating: 4.2 },
+
+        // OCEANIA (15 spots)
+        { id: 76, name: 'Superbank', country: 'Australia', region: 'Gold Coast', difficulty: 'advanced', waves: '5-10ft', water: '72°F', rating: 4.5 },
+        { id: 77, name: 'Bells Beach', country: 'Australia', region: 'Victoria', difficulty: 'advanced', waves: '4-7ft', water: '68°F', rating: 4.4 },
+        { id: 78, name: 'Byron Bay', country: 'Australia', region: 'NSW', difficulty: 'intermediate', waves: '3-5ft', water: '72°F', rating: 4.2 },
+        { id: 79, name: 'Bondi Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.8 },
+        { id: 80, name: 'Manly Beach', country: 'Australia', region: 'NSW', difficulty: 'beginner', waves: '2-3ft', water: '71°F', rating: 3.9 },
+        { id: 81, name: 'Margaret River', country: 'Australia', region: 'Western Australia', difficulty: 'advanced', waves: '4-8ft', water: '65°F', rating: 4.5 },
+        { id: 82, name: 'Yallingup', country: 'Australia', region: 'Western Australia', difficulty: 'intermediate', waves: '3-5ft', water: '65°F', rating: 4.3 },
+        { id: 83, name: 'Shipstern Bluff', country: 'Australia', region: 'Tasmania', difficulty: 'expert', waves: '6-10ft', water: '55°F', rating: 4.8 },
+        { id: 84, name: 'Raglan', country: 'New Zealand', region: 'Waikato', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.3 },
+        { id: 85, name: 'Piha', country: 'New Zealand', region: 'Auckland', difficulty: 'intermediate', waves: '3-5ft', water: '62°F', rating: 4.1 },
+        { id: 86, name: 'Taranaki', country: 'New Zealand', region: 'Taranaki', difficulty: 'intermediate', waves: '3-5ft', water: '60°F', rating: 4.2 },
+        { id: 87, name: 'Nukuʻalofa', country: 'Tonga', region: 'Tongatapu', difficulty: 'advanced', waves: '4-6ft', water: '80°F', rating: 4.4 },
+        { id: 88, name: 'Teahupoo', country: 'French Polynesia', region: 'Tahiti', difficulty: 'expert', waves: '6-10ft', water: '80°F', rating: 4.9 },
+        { id: 89, name: 'Cloudbreak', country: 'Fiji', region: 'Tavarua', difficulty: 'expert', waves: '4-8ft', water: '79°F', rating: 4.8 },
+        { id: 90, name: 'Restaurants', country: 'Fiji', region: 'Tavarua', difficulty: 'advanced', waves: '4-6ft', water: '79°F', rating: 4.5 },
       ];
       
       // Render spots list
@@ -410,14 +476,9 @@
       
       // Show tab
       function showTab(tabName) {
-        // Hide all tabs
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        
-        // Show selected tab
         document.getElementById(tabName).classList.add('active');
-        
-        // Update nav
         const navIndex = ['home', 'map', 'forecast', 'community', 'profile'].indexOf(tabName);
         document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
       }
